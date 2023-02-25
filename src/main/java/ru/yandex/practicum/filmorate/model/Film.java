@@ -20,7 +20,7 @@ public class Film {
 
     private LocalDate releaseDate;
     @Min(value = 0L, message = "Film duration must be more that 0")
-    private Duration duration;
+    private long duration;
 
    /*
     дата релиза — не раньше 28 декабря 1895 года;
