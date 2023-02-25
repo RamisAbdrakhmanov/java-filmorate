@@ -1,11 +1,12 @@
 package ru.yandex.practicum.filmorate.model;
 
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+import java.time.Duration;
 import java.time.LocalDate;
 
 @Data
@@ -19,7 +20,7 @@ public class Film {
 
     private LocalDate releaseDate;
     @Min(value = 0L, message = "Film duration must be more that 0")
-    private long duration;
+    private Duration duration;
 
    /*
     дата релиза — не раньше 28 декабря 1895 года;
