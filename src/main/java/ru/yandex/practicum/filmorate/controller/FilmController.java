@@ -29,7 +29,7 @@ public class FilmController {
        LocalDate localDate = LocalDate.of(1895, 12, 28);
 
         if (film.getReleaseDate().isBefore(localDate)) {
-            log.warn("Ошибка добавление даты {}, дата должна быть поле {}.",film.getReleaseDate(),localDate);
+            log.warn("Ошибка добавление даты {}, дата должна быть после {}.",film.getReleaseDate(),localDate);
             throw new CustomValidationException("Date is wrong.");
         }
         if (film.getId() == 0) {
@@ -42,7 +42,7 @@ public class FilmController {
 
     @PutMapping
     public Film changeFilm(@Valid @RequestBody Film film) {
-        log.info("Запросто на изменение элемента с id = {} .",film.getId());
+        log.info("Запрос на изменение элемента с id = {} .",film.getId());
 
         for (Film filmSet : films) {
             if (filmSet.getName().equals(film.getName())) {

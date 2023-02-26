@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -147,4 +149,12 @@ public class FilmControllerTest {
     }
 
 
+    @SpringBootApplication
+    public static class FilmorateApplication {
+
+        public static void main(String[] args) {
+            SpringApplication.run(FilmorateApplication.class, args);
+        }
+
+    }
 }
