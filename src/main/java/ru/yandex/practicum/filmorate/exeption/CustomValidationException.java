@@ -1,11 +1,11 @@
-package ru.yandex.practicum.filmorate.exeptions;
+package ru.yandex.practicum.filmorate.exeption;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-public class ValidationException extends RuntimeException {
-    public ValidationException(String message) {
+public class CustomValidationException extends RuntimeException {
+    public CustomValidationException(String message) {
         super(message);
     }
 }
