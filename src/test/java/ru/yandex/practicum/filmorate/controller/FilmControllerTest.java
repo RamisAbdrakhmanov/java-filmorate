@@ -134,7 +134,7 @@ public class FilmControllerTest {
                 .duration(12)
                 .build();
 
-        controller.getFilms().add(film);
+        controller.showFilms().add(film);
 
         String filmJson = "{\"id\":17,\"name\":\"asdgr\"," +
                 "\"description\":\"assadd\"," +

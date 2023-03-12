@@ -109,8 +109,7 @@ public class UserControllerTest {
                 "\"login\":\"dolore\"," +
                 "\"name\":\"\"," +
                 "\"birthday\":\"1946-08-20\"}";
-        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
-                        .content(userJson))
+        mockMvc.perform(post("/users").content(userJson))
                 .andExpect(status().isOk()).andExpect(content().string(containsString("\"name\":\"dolore\"")));
 
     }
@@ -123,7 +122,7 @@ public class UserControllerTest {
 
         String userJson = "{\"id\":716," +
                 "\"email\":\"annaPUT@mail.ru\"," +
-                "\"login\":\"Anka\"," +
+                "\"login\":\"Anasdka\"," +
                 "\"name\":\"Anna\"," +
                 "\"birthday\":\""+date+"\"}";
         mockMvc.perform(put("/users").contentType(MediaType.APPLICATION_JSON)
