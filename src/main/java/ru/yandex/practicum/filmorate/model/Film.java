@@ -25,7 +25,7 @@ public class Film {
     @Min(value = 0L, message = "Film duration must be more that 0")
     private long duration;
     @JsonIgnore
-    private final Map<User,Integer> likes = new HashMap<>();
+    private final Map<User, Integer> likes = new HashMap<>();
 
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -41,13 +41,15 @@ public class Film {
         return id;
     }
 
-    public void addLike(User user){
-        likes.put(user,0);
+    public void addLike(User user) {
+        likes.put(user, 0);
     }
-    public void deleteLike(User user){
+
+    public void deleteLike(User user) {
         likes.remove(user);
     }
-    public Integer getAmountLikes(){
+
+    public Integer showAmountLikes() {
         return getLikes().size();
     }
 

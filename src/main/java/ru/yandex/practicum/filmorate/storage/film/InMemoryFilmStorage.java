@@ -22,8 +22,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Autowired
     public InMemoryFilmStorage() {
         films = new HashMap<>();
-        nameFilms = new HashSet<>() {
-        };
+        nameFilms = new HashSet<>();
     }
 
     @Override
@@ -60,9 +59,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void deleteFilmById(int id) {
-        nameFilms.remove(films.get(id).getName());
-        films.remove(1);
-        nameFilms.remove(films.get(id).getName());
+        Film film = films.get(id);
+        nameFilms.remove(film.getName());
+        films.remove(id);
 
     }
 

@@ -9,8 +9,12 @@ import java.util.List;
 public interface UserStorage {
 
     List<User> showUsers();
+
     User showUserById(int id);
+
     User addUser(User user);
+
     User changeUser(User user);
-    void deleteUser(User user);
+
+    void deleteUserById(int id);
 }

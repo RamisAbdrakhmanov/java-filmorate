@@ -67,12 +67,9 @@ public class InMemoryUserStorage implements UserStorage {
             log.debug("Ошибока формы запроса, запрос должен был быть формата POST");
             return addUser(user);
         } else {
-
             checkUser(user);
             User checkUser = users.get(user.getId());
-            users.remove(checkUser.getId());
-
-            deleteUser(checkUser);
+            deleteUserById(checkUser.getId());
 
             logins.add(user.getLogin());
             emails.add(user.getEmail());
@@ -82,7 +79,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void deleteUser(User user) {
+    public void deleteUserById(int id) {
+        User user = users.get(id);
         users.remove(user.getId());
         logins.remove(user.getLogin());
         emails.remove(user.getEmail());
@@ -135,8 +133,7 @@ public class InMemoryUserStorage implements UserStorage {
             }
         }
 
-
-        if (user.getName() == null || user.getName().isBlank()) {
+        if (user.getName().isBlank()) {
             log.debug("User don't have name");
             user.setName(user.getLogin());
         }
