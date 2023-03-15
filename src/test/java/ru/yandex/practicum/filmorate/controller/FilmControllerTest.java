@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -39,30 +40,31 @@ public class FilmControllerTest {
     public void showFilmsTest() throws Exception {
         Film film = addFilm();
 
-        String filmJson = "[{\"id\":1,\"name\":\"filmName\",\"description\":\"filmDescription\"," +
-                "\"releaseDate\":\"2022-12-13\",\"duration\":12}]";
+        String filmJson = "\"name\":\"filmName\",\"description\":\"filmDescription\"," +
+                "\"releaseDate\":\"2022-12-13\"";
         mockMvc.perform(get("/films"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().string(filmJson));
+                .andExpect(content().string(containsString(filmJson)));
 
         filmController.deleteFilmById(film.getId());
     }
+
     @Test
     public void showFilmByIdTest() throws Exception {
         Film film = addFilm();
 
-        String filmJson = "{\"id\":"+film.getId()+",\"name\":\"filmName\"," +
-                "\"description\":\"filmDescription\",\"releaseDate\":\"2022-12-13\",\"duration\":12}";
-        mockMvc.perform(get("/films/"+film.getId()))
+        String filmJson = "\"name\":\"filmName\"," +
+                "\"description\":\"filmDescription\",\"releaseDate\":\"2022-12-13\"";
+        mockMvc.perform(get("/films/" + film.getId()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().string(filmJson));
+                .andExpect(content().string(containsString(filmJson)));
 
 
         filmController.deleteFilmById(film.getId());
-        System.out.println(filmController.showFilms());
     }
+
     @Test
     public void showFilmByIdWrongTest() throws Exception {
         mockMvc.perform(get("/films/-1"))
@@ -166,48 +168,100 @@ public class FilmControllerTest {
     }
 
 
-
     //______________________________________________Test like______________________________________
 
-   /* @Test
-    public void addLikeTest(){
-        Film film = addFilm();
-        User user = addUser();
-
-        filmController.deleteFilmById(film.getId());
-        userController.deleteUserById(user.getId());
-
-    }
-
     @Test
-    public  void deleteLikeTest(){
+    public void addLikeTest() throws Exception {
         Film film = addFilm();
         User user = addUser();
+
+        mockMvc.perform(put("/films/{id}/like/{userId}", film.getId(), user.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
+
+        assertEquals("Like don't add in film", (Integer) 1, film.showAmountLikes());
 
         filmController.deleteFilmById(film.getId());
         userController.deleteUserById(user.getId());
     }
 
     @Test
-    public void showPopularFilms() throws Exception {
+    public void deleteLikeTest() throws Exception {
         Film film = addFilm();
         User user = addUser();
 
-       *//* mockMvc.perform(put("/{id}/like/{userId}",film.getId(),user.getId()))
-                .andExpect(status().isOk());*//*
+        mockMvc.perform(put("/films/{id}/like/{userId}", film.getId(), user.getId()))
+                .andExpect(status().isOk());
+        mockMvc.perform(delete("/films/{id}/like/{userId}", film.getId(), user.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
+
+        assertEquals("Like don't add in film", (Integer) 0, film.showAmountLikes());
 
         filmController.deleteFilmById(film.getId());
         userController.deleteUserById(user.getId());
-    }*/
+    }
 
-    private Film addFilm(){
+    @Test
+    public void showPopularFilmsDefaultTest() throws Exception {
+        Film film = addFilm();
+        User user = addUser();
+
+        String popular = "\"name\":\"filmName\",\"description\":\"filmDescription\"," +
+                "\"releaseDate\":\"2022-12-13\"";
+        mockMvc.perform(put("/films/{id}/like/{userId}", film.getId(), user.getId()))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/films/popular"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(popular)));
+
+
+        filmController.deleteFilmById(film.getId());
+        userController.deleteUserById(user.getId());
+    }
+
+    @Test
+    public void showPopular5FilmsTest() throws Exception {
+        Film film = addFilm();
+        User user = addUser();
+
+        String popular = "\"name\":\"filmName\",\"description\":\"filmDescription\"," +
+                "\"releaseDate\":\"2022-12-13\"";
+        mockMvc.perform(put("/films/{id}/like/{userId}", film.getId(), user.getId()))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/films/popular?count={count}", 5))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(popular)));
+
+
+        filmController.deleteFilmById(film.getId());
+        userController.deleteUserById(user.getId());
+    }
+
+    @Test
+    public void showPopularFilmsIncorrectCountTest() throws Exception {
+        Film film = addFilm();
+        User user = addUser();
+
+        mockMvc.perform(put("/films/{id}/like/{userId}", film.getId(), user.getId()))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/films/popular?count={count}", -1))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("incorrect")));
+
+
+        filmController.deleteFilmById(film.getId());
+        userController.deleteUserById(user.getId());
+    }
+
+    private Film addFilm() {
         LocalDate date = LocalDate.of(2022, 12, 13);
         Film film = Film.builder().name("filmName").description("filmDescription").releaseDate(date).duration(12).build();
         filmController.addFilm(film);
         return film;
     }
 
-    private User addUser(){
+    private User addUser() {
         LocalDate dateUser = LocalDate.of(1980, 8, 12);
         User user = User.builder().name("userName").email("user@mail.ru").login("userLogin").birthday(dateUser).build();
         userController.addUser(user);

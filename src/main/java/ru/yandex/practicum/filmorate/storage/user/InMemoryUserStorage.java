@@ -61,9 +61,6 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User changeUser(User user) {
         if (!users.containsKey(user.getId())) {
-            /* throw new UserNotFoundException(String.format("Cannot search user by %s.", id));*/
-
-
             log.debug("Ошибока формы запроса, запрос должен был быть формата POST");
             return addUser(user);
         } else {

@@ -13,8 +13,8 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -30,11 +30,6 @@ public class UserControllerTest {
 
     @Autowired
     private UserController userController;
-
-    @Test
-    public void contextLoads() {
-        assertThat(userController).isNotNull();
-    }
 
     @Test
     public void addUsersTest() throws Exception {
@@ -136,6 +131,106 @@ public class UserControllerTest {
 
     }
     //------------------------------------------test Friends-----------------------------------------------
+
+    @Test
+    public void addFriendTest() throws Exception {
+        LocalDate date = LocalDate.of(1980, 8, 12);
+        User user = User.builder().id(1234).name("userFriend").email("userFriend@mail.ru").login("userFriend").birthday(date).build();
+        userController.addUser(user);
+
+        LocalDate date2 = LocalDate.of(1980, 8, 12);
+        User friend = User.builder().id(1245).name("Friend").email("Friend@mail.ru").login("Friend").birthday(date2).build();
+        userController.addUser(friend);
+
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", user.getId(), friend.getId()))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/users/{id}/friends", user.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(friend.getEmail())));
+
+        mockMvc.perform(get("/users/{id}/friends", friend.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(user.getEmail())));
+
+        userController.deleteUserById(user.getId());
+        userController.deleteUserById(friend.getId());
+    }
+
+    @Test
+    public void addFriendIncorrectIdTest() throws Exception {
+
+        LocalDate date = LocalDate.of(1980, 8, 12);
+        User user = User.builder().id(1234).name("userFriend").email("userFriend@mail.ru").login("userFriend").birthday(date).build();
+        userController.addUser(user);
+
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", user.getId(), 111))
+                .andExpect(status().is4xxClientError());
+
+        userController.deleteUserById(user.getId());
+    }
+
+    @Test
+    public void addFriendIncorrectIdOwnHimselfTest() throws Exception {
+
+        LocalDate date = LocalDate.of(1980, 8, 12);
+        User user = User.builder().id(1234).name("userFriend").email("userFriend@mail.ru").login("userFriend").birthday(date).build();
+        userController.addUser(user);
+
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", user.getId(), user.getId()))
+                .andExpect(status().is4xxClientError())
+                .andExpect(content().string(containsString("The user cannot be his own friend")));
+
+        userController.deleteUserById(user.getId());
+    }
+
+    @Test
+    public void deleteFriendTest() throws Exception {
+        LocalDate date = LocalDate.of(1980, 8, 12);
+        User user = User.builder().id(1234).name("userFriend").email("userFriend@mail.ru").login("userFriend").birthday(date).build();
+        userController.addUser(user);
+
+        LocalDate date2 = LocalDate.of(1980, 8, 12);
+        User friend = User.builder().id(1245).name("Friend").email("Friend@mail.ru").login("Friend").birthday(date2).build();
+        userController.addUser(friend);
+
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", user.getId(), friend.getId()))
+                .andExpect(status().isOk());
+        mockMvc.perform(delete("/users/{id}/friends/{friendId}", user.getId(), friend.getId()))
+                .andExpect(status().isOk());
+
+        assertEquals("Controller didn't delete friend from user", user.getFriends().size(), 0);
+        assertEquals("Controller didn't delete friend from friend", friend.getFriends().size(), 0);
+
+        userController.deleteUserById(user.getId());
+        userController.deleteUserById(friend.getId());
+    }
+
+    @Test
+    public void showFriendsTest() throws Exception {
+        LocalDate date = LocalDate.of(1980, 8, 12);
+        User user = User.builder().id(1234).name("userFriend").email("userFriend@mail.ru").login("userFriend").birthday(date).build();
+        userController.addUser(user);
+
+        LocalDate date2 = LocalDate.of(1980, 8, 12);
+        User friend = User.builder().id(1245).name("Friend").email("Friend@mail.ru").login("Friend").birthday(date2).build();
+        userController.addUser(friend);
+
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", user.getId(), friend.getId()))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/users/{id}/friends", user.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(friend.getEmail())));
+
+        mockMvc.perform(get("/users/{id}/friends", friend.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(user.getEmail())));
+
+        userController.deleteUserById(user.getId());
+        userController.deleteUserById(friend.getId());
+
+    }
 
 
 }

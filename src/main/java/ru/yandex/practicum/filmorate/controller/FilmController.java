@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exeption.IncorrectParamException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -53,6 +54,9 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<Film> showPopularFilms(@RequestParam(defaultValue = "10", required = false) int count) {
+        if (count <= 0) {
+            throw new IncorrectParamException("Count param is incorrect.");
+        }
         return filmService.showPopularFilms(count);
     }
 
