@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,6 +9,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Builder
@@ -18,12 +21,12 @@ public class Film {
     @NotEmpty
     @Size(max = 200, message = "Film description must be less than 200 characters.")
     private String description;
-
     private LocalDate releaseDate;
     @Min(value = 0L, message = "Film duration must be more that 0")
     private long duration;
+    @JsonIgnore
+    private final Map<User, Integer> likes = new HashMap<>();
 
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -38,5 +41,16 @@ public class Film {
         return id;
     }
 
+    public void addLike(User user) {
+        likes.put(user, 0);
+    }
+
+    public void deleteLike(User user) {
+        likes.remove(user);
+    }
+
+    public Integer showAmountLikes() {
+        return getLikes().size();
+    }
 
 }
