@@ -25,6 +25,9 @@ public class User {
     private LocalDate birthday;
     @JsonIgnore
     private final Set<User> friends = new HashSet<>();
+    /*private final HashMap<User, Boolean> friends2 = new HashMap<>(); */
+
+
 
 
     @Override
