@@ -109,7 +109,7 @@ public class FilmDbDao implements FilmDao {
 
         LocalDate localDate = LocalDate.of(1895, 12, 28);
         if (film.getReleaseDate().isBefore(localDate)) {
-            log.warn("Ошибка добавление даты {}, дата должна быть после {}.", film.getReleaseDate(), localDate);
+            log.error("Ошибка добавление даты {}, дата должна быть после {}.", film.getReleaseDate(), localDate);
             throw new DateReleaseException("Date is wrong.");
         }
 
