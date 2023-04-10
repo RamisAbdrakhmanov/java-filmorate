@@ -94,7 +94,13 @@ public class FriendDbDao implements FriendDao {
                         + "WHERE user_id=%d "
                         + "OR (friend_id=%d and status=%b)  ", id, id, true), new FriendMapper())
                 .stream()
-                .map(Friend::getFriendId).distinct().collect(Collectors.toList());
+                .map(friend1 -> {
+                    if (friend1.getFriendId() != id) {
+                        return friend1.getFriendId();
+                    } else {
+                        return friend1.getUserId();
+                    }
+                }).distinct().collect(Collectors.toList());
         return friend;
     }
 
