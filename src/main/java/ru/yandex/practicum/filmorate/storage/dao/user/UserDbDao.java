@@ -121,9 +121,9 @@ public class UserDbDao implements UserDao {
                     , loginUser.getLogin()
                     , loginUser.getId());
             throw new UserLoginAlreadyExistException(
-                    String.format("Невозможно добавить User. User c login - %s уже имеет ID - %s"
-                            , loginUser.getLogin()
-                            , loginUser.getId()));
+                    String.format("Невозможно добавить User. User c login - %s уже имеет ID - %s",
+                            loginUser.getLogin(),
+                            loginUser.getId()));
 
         } catch (EmptyResultDataAccessException e) { // эта ошибка обрабатывает NULL на выходе из базы,
             // иначе не нашел как мне получить или null или значение.
@@ -140,9 +140,9 @@ public class UserDbDao implements UserDao {
                     , emailUser.getEmail()
                     , emailUser.getId());
             throw new UserEmailAlreadyExistException(
-                    String.format("Невозможно добавить user. User c email - %s уже имеет ID - %s"
-                            , emailUser.getEmail()
-                            , emailUser.getId()));
+                    String.format("Невозможно добавить user. User c email - %s уже имеет ID - %s",
+                            emailUser.getEmail(),
+                            emailUser.getId()));
 
         } catch (EmptyResultDataAccessException e) {
             log.info("User с email {} отсутствует!", user.getEmail());
@@ -164,13 +164,13 @@ public class UserDbDao implements UserDao {
                     + "WHERE login= '%s'", user.getLogin()), new UserMapper());
 
             if (loginUser.getId() != user.getId()) {
-                log.error("Невозможно изменить login. User c login - {} уже имеет ID - {}"
-                        , loginUser.getLogin()
-                        , loginUser.getId());
+                log.error("Невозможно изменить login. User c login - {} уже имеет ID - {}",
+                        loginUser.getLogin(),
+                        loginUser.getId());
                 throw new FilmNameAlreadyExistException(
-                        String.format("Невозможно изменить login. User c login - %s уже имеет ID - %s"
-                                , loginUser.getLogin()
-                                , loginUser.getId()));
+                        String.format("Невозможно изменить login. User c login - %s уже имеет ID - %s",
+                                loginUser.getLogin(),
+                                loginUser.getId()));
             }
 
         } catch (EmptyResultDataAccessException e) { // эта ошибка обрабатывает NULL на выходе из базы,
@@ -185,13 +185,13 @@ public class UserDbDao implements UserDao {
                     + "WHERE name= '%s'", user.getEmail()), new UserMapper());
 
             if (emailUser.getId() != user.getId()) {
-                log.error("Невозможно изменить email. User c email - {} уже имеет ID - {}"
-                        , emailUser.getEmail()
-                        , emailUser.getId());
+                log.error("Невозможно изменить email. User c email - {} уже имеет ID - {}",
+                        emailUser.getEmail(),
+                        emailUser.getId());
                 throw new FilmNameAlreadyExistException(
-                        String.format("Невозможно изменить email. User c email - %s уже имеет ID - %s"
-                                , emailUser.getName()
-                                , emailUser.getId()));
+                        String.format("Невозможно изменить email. User c email - %s уже имеет ID - %s",
+                                emailUser.getName(),
+                                emailUser.getId()));
             }
 
         } catch (EmptyResultDataAccessException e) {
