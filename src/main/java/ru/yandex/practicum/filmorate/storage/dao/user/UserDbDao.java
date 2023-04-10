@@ -117,9 +117,9 @@ public class UserDbDao implements UserDao {
                     + "FROM users "
                     + "WHERE login= '%s'", user.getLogin()), new UserMapper());
 
-            log.error("Невозможно добить User. User c login - {} уже имеет ID - {}"
-                    , loginUser.getLogin()
-                    , loginUser.getId());
+            log.error("Невозможно добить User. User c login - {} уже имеет ID - {}",
+                    loginUser.getLogin(),
+                    loginUser.getId());
             throw new UserLoginAlreadyExistException(
                     String.format("Невозможно добавить User. User c login - %s уже имеет ID - %s",
                             loginUser.getLogin(),
