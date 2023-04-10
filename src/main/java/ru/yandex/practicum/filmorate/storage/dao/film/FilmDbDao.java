@@ -119,13 +119,13 @@ public class FilmDbDao implements FilmDao {
                             "FROM films " +
                             "WHERE name= '%s' ", film.getName()), new FilmMapper()));
 
-            log.error("Фильм в именем - {} уже имеет ID - {}"
-                    , Objects.requireNonNull(nameFilm).getName()
-                    , nameFilm.getId());
+            log.error("Фильм в именем - {} уже имеет ID - {}",
+                    Objects.requireNonNull(nameFilm).getName(),
+                    nameFilm.getId());
             throw new FilmNameAlreadyExistException(
-                    String.format("Фильм в именем - %s уже имеет ID - %s"
-                            , nameFilm.getName()
-                            , nameFilm.getId()));
+                    String.format("Фильм в именем - %s уже имеет ID - %s",
+                            nameFilm.getName(),
+                            nameFilm.getId()));
 
         } catch (EmptyResultDataAccessException e) { // эта ошибка обрабатывает NULL на выходе из базы,
             // иначе не нашел как мне получить или null или значение.
