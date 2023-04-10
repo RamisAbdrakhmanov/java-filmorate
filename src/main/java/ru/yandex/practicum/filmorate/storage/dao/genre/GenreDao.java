@@ -17,6 +17,4 @@ public interface GenreDao {
     void deleteGenre(int id);
 
     Set<Genre> getGenres(int id);
-
-
 }
