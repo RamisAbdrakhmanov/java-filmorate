@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.user;
+package ru.yandex.practicum.filmorate.storage.dao.user;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.List;
 
 @Component
-public interface UserStorage {
+public interface UserDao {
 
     List<User> showUsers();
 
