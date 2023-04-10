@@ -16,6 +16,7 @@ public class ErrorHandler {
     public ErrorResponse handlerDateReleaseException(final DateReleaseException e) {
         return new ErrorResponse(e.getMessage());
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handlerUserLoginAlreadyExistException(final UserLoginAlreadyExistException e) {
