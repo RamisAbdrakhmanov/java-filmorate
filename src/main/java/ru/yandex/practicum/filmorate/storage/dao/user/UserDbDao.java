@@ -136,9 +136,9 @@ public class UserDbDao implements UserDao {
                     + "FROM users "
                     + "WHERE name= '%s'", user.getEmail()), new UserMapper());
 
-            log.error("Невозможно добавить user. User c email - {} уже имеет ID - {}"
-                    , emailUser.getEmail()
-                    , emailUser.getId());
+            log.error("Невозможно добавить user. User c email - {} уже имеет ID - {}",
+                    emailUser.getEmail(),
+                    emailUser.getId());
             throw new UserEmailAlreadyExistException(
                     String.format("Невозможно добавить user. User c email - %s уже имеет ID - %s",
                             emailUser.getEmail(),
