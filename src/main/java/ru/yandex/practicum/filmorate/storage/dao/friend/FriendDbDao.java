@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exeption.not_found.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Friend;
 import ru.yandex.practicum.filmorate.storage.mapper.FriendMapper;
 
@@ -24,17 +25,7 @@ public class FriendDbDao implements FriendDao {
         log.info("запрос на добавления в друзья от {} к {}", userId, friendId);
         switch (checkFriend(userId, friendId)) {
             case 1:
-                log.info("User с id - {}, принял заявку user с id - {}", userId, friendId);
-                jdbcTemplate.update(""
-                                + "UPDATE friends "
-                                + "SET user_id=?, friend_id=?, status=? "
-                                + "WHERE user_id=? "
-                                + "AND friend_id=? ",
-                        userId,
-                        friendId,
-                        true,
-                        userId,
-                        friendId);
+                log.info("User с id - {}, уже отправлял заявку friend с id - {}", userId, friendId);
                 break;
             case 0:
                 log.info("User с id - {}, подал заявку user с id - {}", userId, friendId);
@@ -42,7 +33,7 @@ public class FriendDbDao implements FriendDao {
                         "VALUES(?, ?, ?)", userId, friendId, false);
                 break;
             case -1:
-                log.info("User с id - {}, принял заявку user с id - {}", friendId, userId);
+                log.info("User с id - {}, принял заявку friend с id - {}", friendId, userId);
                 jdbcTemplate.update(""
                                 + "UPDATE friends "
                                 + "SET user_id=?, friend_id=?, status=? "
@@ -96,9 +87,6 @@ public class FriendDbDao implements FriendDao {
     @Override
     public List<Integer> showFriendsById(int id) {
         log.info("запрос на вывод друзей пользователя ID - {}", id);
-        List<Friend> a = jdbcTemplate.query(
-                "SELECT user_id, friend_id, status " +
-                        "FROM friends ", new FriendMapper());
 
         List<Integer> friend = jdbcTemplate.query(format(""
                         + "SELECT user_id, friend_id, status "
@@ -111,7 +99,7 @@ public class FriendDbDao implements FriendDao {
     }
 
     private Friend get(int userId, int friendId) {
-        log.info("запрос на одну отдельную заявку");
+        log.info("запрос на одну отдельную заявку друзей");
         return jdbcTemplate.queryForObject(format(""
                 + "SELECT user_id, friend_id, status "
                 + "FROM friends "
@@ -122,7 +110,7 @@ public class FriendDbDao implements FriendDao {
     private byte checkFriend(int userId, int friendId) {
         log.info("проверка записи друзей");
         try {
-
+            log.debug("user_id: {}, уже добавил friend_id: {}", userId, friendId);
             Friend friend = jdbcTemplate.queryForObject(format(""
                     + "SELECT user_id, friend_id, status "
                     + "FROM friends "
@@ -136,13 +124,18 @@ public class FriendDbDao implements FriendDao {
 
         }
         try {
-
+            log.info("user_id: {} пытается одобрить заявку friend_id: {}", userId, friendId);
             Friend friend = jdbcTemplate.queryForObject(format(""
                     + "SELECT user_id, friend_id, status "
                     + "FROM friends "
                     + "WHERE user_id=%d "
                     + "AND friend_id=%d ", friendId, userId), new FriendMapper());
             log.info("запись имеется в развернутом формате {}", friend);
+            if (friend.getStatus()) {
+                log.debug("user_id: {} уже одобрить заявку friend_id: {}", userId, friendId);
+                throw new UserNotFoundException("Уже добавлены в друзья");
+            }
+            log.debug("user_id: {} может одобрить заявку friend_id: {}", userId, friendId);
             return -1;
 
         } catch (EmptyResultDataAccessException e) {

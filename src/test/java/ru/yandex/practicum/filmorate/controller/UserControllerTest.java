@@ -1,20 +1,18 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.yandex.practicum.filmorate.model.User;
-
-import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -24,49 +22,78 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ComponentScan(basePackages = {"ru.yandex.practicum.filmorate"})
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private UserController userController;
-
     @Test
     public void addUsersTest() throws Exception {
-        String userJson = "{\"id\":18," +
-                "\"email\":\"mail@mail.ru\"," +
-                "\"login\":\"dolore\"," +
-                "\"name\":\"Nick Name\"," +
-                "\"birthday\":\"1946-08-20\"}";
+        String userJson = "{\"login\": \"dolore\"," +
+                " \"name\": \"Nick Name\"," +
+                " \"email\": \"mail@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
+
         mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
-                .andExpect(status().isOk()).andExpect(content().string(userJson));
+                .andExpect(status().isOk()).andExpect(content().string(containsString("\"id\":8")));
+
+        mockMvc.perform(delete("/users/8"));
     }
 
     @Test
-    public void showUsersTest() throws Exception {
-        LocalDate dateUser = LocalDate.of(1980, 8, 12);
-        User user = User.builder().name("userName").email("user@mail.ru").login("userLogin").birthday(dateUser).build();
-        userController.addUser(user);
+    public void getUserTest() throws Exception {
+        String userJson = "{\"login\": \"dolore\"," +
+                " \"name\": \"Nick Name\"," +
+                " \"email\": \"mail@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
 
-        String userJson = "[{\"id\":1,\"email\":\"user@mail.ru\"," +
-                "\"login\":\"userLogin\",\"name\":\"userName\"," +
-                "\"birthday\":\"1980-08-12\"}]";
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(userJson));
+        mockMvc.perform(get("/users/11"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("\"id\":11")));
+
+        mockMvc.perform(delete("/users/11"));
+
+    }
+
+    @Test
+    public void getAllUsersTest() throws Exception {
+        String userJson = "{\"login\": \"dolore\"," +
+                " \"name\": \"Nick Name\"," +
+                " \"email\": \"mail@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
+
+        String userJson2 = "{\"login\": \"user2\"," +
+                " \"name\": \"user2 Name\"," +
+                " \"email\": \"user2@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
+
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(userJson));
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(userJson2));
+
+
         mockMvc.perform(get("/users"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().string(userJson));
+                .andExpect(content().string(containsString("\"id\":3")))
+                .andExpect(content().string(containsString("\"id\":4")));
+
+        mockMvc.perform(delete("/users/3"));
+        mockMvc.perform(delete("/users/4"));
 
     }
 
 
     @Test
     public void addUsersTestFailEmail() throws Exception {
-        String userJson = "{\"id\":18," +
-                "\"email\":\"mailmail.ru\"," +
-                "\"login\":\"dolore\"," +
-                "\"name\":\"Nick Name\"," +
-                "\"birthday\":\"1946-08-20\"}";
+        String userJson = "{\"login\": \"dolore\"," +
+                " \"name\": \"Nick Name\"," +
+                " \"email\": \"mailmailru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
+
         mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
                 .andExpect(status().is4xxClientError());
@@ -75,11 +102,10 @@ public class UserControllerTest {
 
     @Test
     public void addUsersTestFailLogin() throws Exception {
-        String userJson = "{\"id\":18," +
-                "\"email\":\"mail@mail.ru\"," +
-                "\"login\":\"\"," +
-                "\"name\":\"Nick Name\"," +
-                "\"birthday\":\"1946-08-20\"}";
+        String userJson = "{\"login\": \"\"," +
+                " \"name\": \"Nick Name\"," +
+                " \"email\": \"mail@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
         mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
                 .andExpect(status().is4xxClientError());
@@ -88,147 +114,193 @@ public class UserControllerTest {
 
     @Test
     public void addUsersTestFailBirthday() throws Exception {
-        LocalDate date = LocalDate.of(2044, 8, 12);
-
-        String userJson = "{\"id\":18," +
-                "\"email\":\"mail@mail.ru\"," +
-                "\"login\":\"dolore\"," +
-                "\"name\":\"Nick Name\"," +
-                "\"birthday\":\"" + date + "\"}";
+        String userJson = "{\"login\": \"dolore\"," +
+                " \"name\": \"Nick Name\"," +
+                " \"email\": \"mail@mail.ru\"," +
+                "  \"birthday\": \"2046-08-20\"}";
         mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
                 .andExpect(status().is4xxClientError());
 
     }
 
-    @Test
-    public void addUsersTestWithEmptyName() throws Exception {
-        String userJson = "{\"id\":254," +
-                "\"email\":\"doloresAmbr@mail.ru\"," +
-                "\"login\":\"doloresit\"," +
-                "\"name\":\"\"," +
-                "\"birthday\":\"1946-08-20\"}";
-        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(userJson))
-                .andExpect(status().isOk()).andExpect(content().string(containsString("\"name\":\"doloresit\"")));
 
+    @Test
+    public void updateUser() throws Exception {
+        String userJson = "{\"login\": \"dolore\"," +
+                " \"name\": \"\"," +
+                " \"email\": \"mail@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
+                .content(userJson));
+
+        String userJsonUpdate = "{\"id\": 7,\"login\": \"update_user\"," +
+                " \"name\": \"update_user\"," +
+                " \"email\": \"update_user@mail.ru\"," +
+                "  \"birthday\": \"1986-08-20\"}";
+        mockMvc.perform(put("/users").contentType(MediaType.APPLICATION_JSON)
+                        .content(userJsonUpdate))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("\"email\":\"update_user@mail.ru\"," +
+                        "\"login\":\"update_user\"," +
+                        "\"name\":\"update_user\"," +
+                        "\"birthday\":\"1986-08-20\"")));
+
+        mockMvc.perform(delete("/users/7"));
     }
 
     @Test
-    public void changeUsersTest() throws Exception {
-        LocalDate date = LocalDate.of(1980, 8, 12);
-        User user = User.builder().id(716).name("change").email("change@mail.ru").login("change").birthday(date).build();
-        userController.addUser(user);
+    public void deleteUserTest() throws Exception {
+        String userJson = "{\"login\": \"dolore\"," +
+                " \"name\": \"Nick Name\"," +
+                " \"email\": \"mail@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
 
-        String userJson = "{\"id\":716," +
-                "\"email\":\"change@mail.ru\"," +
-                "\"login\":\"changechange\"," +
-                "\"name\":\"change\"," +
-                "\"birthday\":\"" + date + "\"}";
-        mockMvc.perform(put("/users").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
-                .andExpect(status().isOk()).andExpect(content().string(userJson));
+                .andExpect(status().isOk()).andExpect(content().string(containsString("\"id\":12")));
 
+        mockMvc.perform(delete("/users/12")).andExpect(status().isOk());
 
+        mockMvc.perform(get("/users/12"))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(containsString("\"error\"")));
     }
     //------------------------------------------test Friends-----------------------------------------------
 
     @Test
     public void addFriendTest() throws Exception {
-        LocalDate date = LocalDate.of(1980, 8, 12);
-        User user = User.builder().id(1234).name("userFriend").email("userFriend@mail.ru").login("userFriend").birthday(date).build();
-        userController.addUser(user);
+        String userJson = "{\"login\": \"dolore\"," +
+                " \"name\": \"Nick Name\"," +
+                " \"email\": \"mail@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
 
-        LocalDate date2 = LocalDate.of(1980, 8, 12);
-        User friend = User.builder().id(1245).name("Friend").email("Friend@mail.ru").login("Friend").birthday(date2).build();
-        userController.addUser(friend);
+        String userJson2 = "{\"login\": \"user2\"," +
+                " \"name\": \"user2 Name\"," +
+                " \"email\": \"user2@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
 
-        mockMvc.perform(put("/users/{id}/friends/{friendId}", user.getId(), friend.getId()))
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(userJson));
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(userJson2));
+
+        mockMvc.perform(put("/users/1/friends/2"))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/users/{id}/friends", user.getId()))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString(friend.getEmail())));
 
-        mockMvc.perform(get("/users/{id}/friends", friend.getId()))
+        mockMvc.perform(get("/users/{id}/friends", 1))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString(user.getEmail())));
+                .andExpect(content().string(containsString("\"id\":2")));
 
-        userController.deleteUserById(user.getId());
-        userController.deleteUserById(friend.getId());
+        mockMvc.perform(get("/users/{id}/friends", 2))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
+
+        mockMvc.perform(put("/users/2/friends/1"))
+                .andExpect(status().isOk());
+
+
+        mockMvc.perform(delete("/users/1/friends/2")).andExpect(status().isOk());
+        mockMvc.perform(delete("/users/2/friends/1")).andExpect(status().isOk());
+        mockMvc.perform(delete("/users/1")).andExpect(status().isOk());
+        mockMvc.perform(delete("/users/2")).andExpect(status().isOk());
+
+
     }
 
     @Test
     public void addFriendIncorrectIdTest() throws Exception {
 
-        LocalDate date = LocalDate.of(1980, 8, 12);
-        User user = User.builder().id(1234).name("userFriend").email("userFriend@mail.ru").login("userFriend").birthday(date).build();
-        userController.addUser(user);
 
-        mockMvc.perform(put("/users/{id}/friends/{friendId}", user.getId(), 111))
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", 1, 111))
                 .andExpect(status().is4xxClientError());
 
-        userController.deleteUserById(user.getId());
     }
 
     @Test
     public void addFriendIncorrectIdOwnHimselfTest() throws Exception {
 
-        LocalDate date = LocalDate.of(1980, 8, 12);
-        User user = User.builder().id(1234).name("userFriend").email("userFriend@mail.ru").login("userFriend").birthday(date).build();
-        userController.addUser(user);
 
-        mockMvc.perform(put("/users/{id}/friends/{friendId}", user.getId(), user.getId()))
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", 1, 1))
                 .andExpect(status().is4xxClientError())
                 .andExpect(content().string(containsString("The user cannot be his own friend")));
 
-        userController.deleteUserById(user.getId());
     }
 
     @Test
     public void deleteFriendTest() throws Exception {
-        LocalDate date = LocalDate.of(1980, 8, 12);
-        User user = User.builder().id(1234).name("userFriend").email("userFriend@mail.ru").login("userFriend").birthday(date).build();
-        userController.addUser(user);
+        String userJson = "{\"login\": \"dolore\"," +
+                " \"name\": \"Nick Name\"," +
+                " \"email\": \"mail@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
 
-        LocalDate date2 = LocalDate.of(1980, 8, 12);
-        User friend = User.builder().id(1245).name("Friend").email("Friend@mail.ru").login("Friend").birthday(date2).build();
-        userController.addUser(friend);
+        String userJson2 = "{\"login\": \"user2\"," +
+                " \"name\": \"user2 Name\"," +
+                " \"email\": \"user2@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
 
-        mockMvc.perform(put("/users/{id}/friends/{friendId}", user.getId(), friend.getId()))
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(userJson));
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(userJson2));
+
+        mockMvc.perform(put("/users/9/friends/10"))
                 .andExpect(status().isOk());
-        mockMvc.perform(delete("/users/{id}/friends/{friendId}", user.getId(), friend.getId()))
+
+
+        mockMvc.perform(get("/users/{id}/friends", 9))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("\"id\":10")));
+
+        mockMvc.perform(get("/users/{id}/friends", 10))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
+
+        mockMvc.perform(put("/users/10/friends/9"))
                 .andExpect(status().isOk());
 
-        assertEquals("Controller didn't delete friend from user", user.getFriends().size(), 0);
-        assertEquals("Controller didn't delete friend from friend", friend.getFriends().size(), 0);
 
-        userController.deleteUserById(user.getId());
-        userController.deleteUserById(friend.getId());
+        mockMvc.perform(delete("/users/9/friends/10")).andExpect(status().isOk());
+        mockMvc.perform(delete("/users/10/friends/9")).andExpect(status().isOk());
+        mockMvc.perform(delete("/users/9")).andExpect(status().isOk());
+        mockMvc.perform(delete("/users/10")).andExpect(status().isOk());
     }
 
     @Test
     public void showFriendsTest() throws Exception {
-        LocalDate date = LocalDate.of(1980, 8, 12);
-        User user = User.builder().id(1234).name("userFriend").email("userFriend@mail.ru").login("userFriend").birthday(date).build();
-        userController.addUser(user);
 
-        LocalDate date2 = LocalDate.of(1980, 8, 12);
-        User friend = User.builder().id(1245).name("Friend").email("Friend@mail.ru").login("Friend").birthday(date2).build();
-        userController.addUser(friend);
+        String userJson = "{\"login\": \"dolore\"," +
+                " \"name\": \"Nick Name\"," +
+                " \"email\": \"mail@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
 
-        mockMvc.perform(put("/users/{id}/friends/{friendId}", user.getId(), friend.getId()))
+        String userJson2 = "{\"login\": \"user2\"," +
+                " \"name\": \"user2 Name\"," +
+                " \"email\": \"user2@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
+
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(userJson));
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(userJson2));
+
+        mockMvc.perform(put("/users/5/friends/6"))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/users/{id}/friends", user.getId()))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString(friend.getEmail())));
 
-        mockMvc.perform(get("/users/{id}/friends", friend.getId()))
+        mockMvc.perform(get("/users/5/friends"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString(user.getEmail())));
+                .andExpect(content().string(containsString("\"id\":6")));
 
-        userController.deleteUserById(user.getId());
-        userController.deleteUserById(friend.getId());
+        mockMvc.perform(get("/users/6/friends"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
+
+        mockMvc.perform(put("/users/6/friends/5"))
+                .andExpect(status().isOk());
+
+
+        mockMvc.perform(delete("/users/5/friends/6")).andExpect(status().isOk());
+        mockMvc.perform(delete("/users/6/friends/5")).andExpect(status().isOk());
+        mockMvc.perform(delete("/users/5")).andExpect(status().isOk());
+        mockMvc.perform(delete("/users/6")).andExpect(status().isOk());
+
 
     }
 

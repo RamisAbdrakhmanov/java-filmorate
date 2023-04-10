@@ -1,21 +1,18 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-
-import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -26,43 +23,49 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ComponentScan(basePackages = {"ru.yandex.practicum.filmorate"})
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private FilmController filmController;
-    @Autowired
-    private UserController userController;
-
-
     @Test
     public void showFilmsTest() throws Exception {
-        Film film = addFilm();
 
-        String filmJson = "\"name\":\"filmName\",\"description\":\"filmDescription\"," +
-                "\"releaseDate\":\"2022-12-13\"";
+        String filmJson = "{\"name\": \"Film Updated\"," +
+                " \"releaseDate\": \"1989-04-17\"," +
+                " \"description\": \"New film update decription\"," +
+                " \"duration\": 190," +
+                " \"rate\": 4," +
+                " \"mpa\": { " +
+                "\"id\": 5}," +
+                "\"genres\": []}\"";
+        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(filmJson));
         mockMvc.perform(get("/films"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString(filmJson)));
+                .andExpect(content().string(containsString("\"id\":1")));
 
-        filmController.deleteFilmById(film.getId());
+        mockMvc.perform(delete("/films/1"));
     }
 
     @Test
     public void showFilmByIdTest() throws Exception {
-        Film film = addFilm();
-
-        String filmJson = "\"name\":\"filmName\"," +
-                "\"description\":\"filmDescription\",\"releaseDate\":\"2022-12-13\"";
-        mockMvc.perform(get("/films/" + film.getId()))
+        String filmJson = "{\"name\": \"Film Updated\"," +
+                " \"releaseDate\": \"1989-04-17\"," +
+                " \"description\": \"New film update decription\"," +
+                " \"duration\": 190," +
+                " \"rate\": 4," +
+                " \"mpa\": { " +
+                "\"id\": 5}," +
+                "\"genres\": []}\"";
+        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(filmJson));
+        mockMvc.perform(get("/films/6"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString(filmJson)));
+                .andExpect(content().string(containsString("\"id\":6")));
 
-
-        filmController.deleteFilmById(film.getId());
+        mockMvc.perform(delete("/films/6"));
     }
 
     @Test
@@ -76,34 +79,45 @@ public class FilmControllerTest {
 
     @Test
     public void addFilmTest() throws Exception {
-        String filmJson = "{\"id\":155,\"name\":\"addfilm\"," +
-                "\"description\":\"addfilm\",\"releaseDate\":\"2022-12-13\",\"duration\":12}";
+        String filmJson = "{\"name\": \"Film Updated\"," +
+                " \"releaseDate\": \"1989-04-17\"," +
+                " \"description\": \"New film update decription\"," +
+                " \"duration\": 190," +
+                " \"rate\": 4," +
+                " \"mpa\": { " +
+                "\"id\": 5}," +
+                "\"genres\": []}\"";
+        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(filmJson))
+                .andExpect(status().isOk());
 
-        mockMvc.perform(post("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(filmJson))
-                .andExpect(status().isOk()).andExpect(content().string(filmJson));
 
-        filmController.deleteFilmById(155);
+        mockMvc.perform(delete("/films/2"));
     }
 
     @Test
     public void addFilmFailNameTest() throws Exception {
-        String filmJson = "{\"name\":\"\",\"description\":\"asd\",\"releaseDate\":\"2022-12-13\",\"duration\":12}";
-
-        mockMvc.perform(post("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(filmJson))
-                .andExpect(status().is4xxClientError());
+        String filmJson = "{\"name\": \"\"," +
+                " \"releaseDate\": \"1989-04-17\"," +
+                " \"description\": \"New film update decription\"," +
+                " \"duration\": 190," +
+                " \"rate\": 4," +
+                " \"mpa\": { " +
+                "\"id\": 5}," +
+                "\"genres\": []}\"";
+        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(filmJson))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void addFilmFailLDescriptionMin1Test() throws Exception {
-        String filmJson = "{\"id\":3," +
-                "\"name\":\"asd\"," +
-                "\"\":\"asd\"," +
-                "\"releaseDate\":\"2022-12-13\"," +
-                "\"duration\":12}";
+        String filmJson = "{\"name\": \"Film Updated\"," +
+                " \"releaseDate\": \"1989-04-17\"," +
+                " \"description\": \"\"," +
+                " \"duration\": 190," +
+                " \"rate\": 4," +
+                " \"mpa\": { " +
+                "\"id\": 5}," +
+                "\"genres\": []}\"";
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -111,27 +125,17 @@ public class FilmControllerTest {
                 .andExpect(status().is4xxClientError());
     }
 
-    @Test
-    public void addFilmFailLDescriptionMax200Test() throws Exception {
-
-        String description = "a".repeat(201);
-
-        String filmJson = "{\"id\":3," +
-                "\"name\":\"asd\"," +
-                "\"" + description + "\":\"asd\"," +
-                "\"releaseDate\":\"2022-12-13\"," +
-                "\"duration\":12}";
-
-        mockMvc.perform(post("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(filmJson))
-                .andExpect(status().is4xxClientError());
-    }
 
     @Test
     public void addFilmFailReleaseDateTest() throws Exception {
-        String filmJson = "{\"id\":3,\"name\":\"asdtr\"," +
-                "\"description\":\"asd\",\"releaseDate\":\"1888-12-13\",\"duration\":12}";
+        String filmJson = "{\"name\": \"Film Updated\"," +
+                " \"releaseDate\": \"1189-04-17\"," +
+                " \"description\": \"New film update decription\"," +
+                " \"duration\": 190," +
+                " \"rate\": 4," +
+                " \"mpa\": { " +
+                "\"id\": 5}," +
+                "\"genres\": []}\"";
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -141,8 +145,14 @@ public class FilmControllerTest {
 
     @Test
     public void addFilmFailDurationTest() throws Exception {
-        String filmJson = "{\"id\":3,\"name\":\"asd\"," +
-                "\"description\":\"asd\",\"releaseDate\":\"2022-12-13\",\"duration\":-1}";
+        String filmJson = "{\"name\": \"Film Updated\"," +
+                " \"releaseDate\": \"1989-04-17\"," +
+                " \"description\": \"New film update decription\"," +
+                " \"duration\": -1," +
+                " \"rate\": 4," +
+                " \"mpa\": { " +
+                "\"id\": 5}," +
+                "\"genres\": []}\"";
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -151,20 +161,30 @@ public class FilmControllerTest {
     }
 
     @Test
-    public void putFilmTest() throws Exception {
-        Film film = addFilm();
-
-        String filmJson = "{\"id\":1,\"name\":\"filmNamePUT\"," +
-                "\"description\":\"filmDescription\",\"releaseDate\":\"2022-12-13\",\"duration\":12}";
-
-        mockMvc.perform(put("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(filmJson))
+    public void updateFilmTest() throws Exception {
+        String filmJson = "{\"name\": \"Film Updated\"," +
+                " \"releaseDate\": \"1989-04-17\"," +
+                " \"description\": \"New film update decription\"," +
+                " \"duration\": 190," +
+                " \"rate\": 4," +
+                " \"mpa\": { " +
+                "\"id\": 5}," +
+                "\"genres\": []}\"";
+        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(filmJson));
+        String filmJson2 = "{\"id\": 4, \"name\": \"Film Updated\"," +
+                " \"releaseDate\": \"1989-04-17\"," +
+                " \"description\": \"New film update decription\"," +
+                " \"duration\": 200," +
+                " \"rate\": 7," +
+                " \"mpa\": { " +
+                "\"id\": 5}," +
+                "\"genres\": []}\"";
+        mockMvc.perform(put("/films").contentType(MediaType.APPLICATION_JSON).content(filmJson2))
                 .andExpect(status().isOk())
-                .andExpect(content().string(filmJson));
+                .andExpect(content().string(containsString("\"duration\":200")));
 
-        filmController.deleteFilmById(1);
-        filmController.deleteFilmById(film.getId());
+
+        mockMvc.perform(delete("/films/4"));
     }
 
 
@@ -172,100 +192,130 @@ public class FilmControllerTest {
 
     @Test
     public void addLikeTest() throws Exception {
-        Film film = addFilm();
-        User user = addUser();
+        String filmJson = "{\"name\": \"Film Updated\"," +
+                " \"releaseDate\": \"1989-04-17\"," +
+                " \"description\": \"New film update decription\"," +
+                " \"duration\": -1," +
+                " \"rate\": 4," +
+                " \"mpa\": { " +
+                "\"id\": 5}," +
+                "\"genres\": []}\"";
 
-        mockMvc.perform(put("/films/{id}/like/{userId}", film.getId(), user.getId()))
-                .andExpect(status().isOk())
-                .andExpect(content().string(""));
+        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(filmJson))
+                .andExpect(status().isBadRequest());
 
-        assertEquals("Like don't add in film", (Integer) 1, film.showAmountLikes());
+        String userJson = "{\"login\": \"dolore\"," +
+                " \"name\": \"Nick Name\"," +
+                " \"email\": \"mailmailru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
 
-        filmController.deleteFilmById(film.getId());
-        userController.deleteUserById(user.getId());
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
+                        .content(userJson))
+                .andExpect(status().isBadRequest());
+
     }
 
     @Test
     public void deleteLikeTest() throws Exception {
-        Film film = addFilm();
-        User user = addUser();
-
-        mockMvc.perform(put("/films/{id}/like/{userId}", film.getId(), user.getId()))
+        String filmJson = "{\"name\": \"Film Updated\"," +
+                " \"releaseDate\": \"1989-04-17\"," +
+                " \"description\": \"New film update decription\"," +
+                " \"duration\": 190," +
+                " \"rate\": 4," +
+                " \"mpa\": { " +
+                "\"id\": 5}," +
+                "\"genres\": []}\"";
+        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(filmJson))
                 .andExpect(status().isOk());
-        mockMvc.perform(delete("/films/{id}/like/{userId}", film.getId(), user.getId()))
+
+        String userJson = "{\"login\": \"dolore\"," +
+                " \"name\": \"Nick Name\"," +
+                " \"email\": \"mail@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
+
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
+                        .content(userJson))
+                .andExpect(status().isOk()).andExpect(content().string(containsString("\"id\":1")));
+
+        mockMvc.perform(put("/films/3/like/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
+        mockMvc.perform(delete("/films/3/like/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(""));
 
-        assertEquals("Like don't add in film", (Integer) 0, film.showAmountLikes());
-
-        filmController.deleteFilmById(film.getId());
-        userController.deleteUserById(user.getId());
+        mockMvc.perform(delete("/films/3"));
+        mockMvc.perform(delete("/users/1"));
     }
 
     @Test
     public void showPopularFilmsDefaultTest() throws Exception {
-        Film film = addFilm();
-        User user = addUser();
-
-        String popular = "\"name\":\"filmName\",\"description\":\"filmDescription\"," +
-                "\"releaseDate\":\"2022-12-13\"";
-        mockMvc.perform(put("/films/{id}/like/{userId}", film.getId(), user.getId()))
+        String filmJson = "{\"name\": \"Film Updated\"," +
+                " \"releaseDate\": \"1989-04-17\"," +
+                " \"description\": \"New film update decription\"," +
+                " \"duration\": 190," +
+                " \"rate\": 4," +
+                " \"mpa\": { " +
+                "\"id\": 5}," +
+                "\"genres\": []}\"";
+        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(filmJson))
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/films/popular"))
+
+        String userJson = "{\"login\": \"dolore\"," +
+                " \"name\": \"Nick Name\"," +
+                " \"email\": \"mail@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
+
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
+                        .content(userJson))
+                .andExpect(status().isOk()).andExpect(content().string(containsString("\"id\":2")));
+
+        mockMvc.perform(put("/films/5/like/2"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString(popular)));
+                .andExpect(content().string(""));
+        mockMvc.perform(delete("/films/5/like/2"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
 
-
-        filmController.deleteFilmById(film.getId());
-        userController.deleteUserById(user.getId());
+        mockMvc.perform(delete("/films/5"));
+        mockMvc.perform(delete("/users/2"));
     }
 
     @Test
     public void showPopular5FilmsTest() throws Exception {
-        Film film = addFilm();
-        User user = addUser();
-
-        String popular = "\"name\":\"filmName\",\"description\":\"filmDescription\"," +
-                "\"releaseDate\":\"2022-12-13\"";
-        mockMvc.perform(put("/films/{id}/like/{userId}", film.getId(), user.getId()))
+        String filmJson = "{\"name\": \"Film Updated\"," +
+                " \"releaseDate\": \"1989-04-17\"," +
+                " \"description\": \"New film update decription\"," +
+                " \"duration\": 190," +
+                " \"rate\": 4," +
+                " \"mpa\": { " +
+                "\"id\": 5}," +
+                "\"genres\": []}\"";
+        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(filmJson))
                 .andExpect(status().isOk());
+
+        String userJson = "{\"login\": \"dolore\"," +
+                " \"name\": \"Nick Name\"," +
+                " \"email\": \"mail@mail.ru\"," +
+                "  \"birthday\": \"1946-08-20\"}";
+
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(userJson))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(put("/films/7/like/3"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
+
         mockMvc.perform(get("/films/popular?count={count}", 5))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString(popular)));
+                .andExpect(content().string(containsString("\"Film Updated\"")));
 
+        mockMvc.perform(delete("/films/7/like/3"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
 
-        filmController.deleteFilmById(film.getId());
-        userController.deleteUserById(user.getId());
-    }
-
-    @Test
-    public void showPopularFilmsIncorrectCountTest() throws Exception {
-        Film film = addFilm();
-        User user = addUser();
-
-        mockMvc.perform(put("/films/{id}/like/{userId}", film.getId(), user.getId()))
-                .andExpect(status().isOk());
-        mockMvc.perform(get("/films/popular?count={count}", -1))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("incorrect")));
-
-
-        filmController.deleteFilmById(film.getId());
-        userController.deleteUserById(user.getId());
-    }
-
-    private Film addFilm() {
-        LocalDate date = LocalDate.of(2022, 12, 13);
-        Film film = Film.builder().name("filmName").description("filmDescription").releaseDate(date).duration(12).build();
-        filmController.addFilm(film);
-        return film;
-    }
-
-    private User addUser() {
-        LocalDate dateUser = LocalDate.of(1980, 8, 12);
-        User user = User.builder().name("userName").email("user@mail.ru").login("userLogin").birthday(dateUser).build();
-        userController.addUser(user);
-        return user;
+        mockMvc.perform(delete("/films/7"));
+        mockMvc.perform(delete("/users/3"));
     }
 
 }
