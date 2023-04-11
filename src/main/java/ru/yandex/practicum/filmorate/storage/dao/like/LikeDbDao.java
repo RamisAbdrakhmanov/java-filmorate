@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exeption.not_found.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.not_found.MpaNotFoundException;
 
 import java.util.List;
@@ -40,7 +41,7 @@ public class LikeDbDao implements LikeDao {
                     + "AND user_id=?", filmID, userID);
         } catch (EmptyResultDataAccessException e) {
             log.error("Не возможно найти film с id - {}.(ну или user(-_-))", filmID);
-            throw new MpaNotFoundException(format("Не возможно найти film с id - %d.(ну или user(-_-))", filmID));
+            throw new LikeNotFoundException(format("Не возможно найти film с id - %d.(ну или user(-_-))", filmID));
         }
     }
 

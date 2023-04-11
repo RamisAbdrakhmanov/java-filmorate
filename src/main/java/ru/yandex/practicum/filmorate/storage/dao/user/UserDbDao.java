@@ -1,11 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.dao.user;
 
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.not_found.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.validate.FilmNameAlreadyExistException;
 import ru.yandex.practicum.filmorate.exeption.validate.UserEmailAlreadyExistException;
@@ -19,16 +20,14 @@ import java.util.List;
 
 import static java.lang.String.format;
 
-@Component
 @Slf4j
+@Primary
+@Repository
+@RequiredArgsConstructor
 public class UserDbDao implements UserDao {
+
     private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    public UserDbDao(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-
-    }
 
     @Override
     public List<User> showUsers() {

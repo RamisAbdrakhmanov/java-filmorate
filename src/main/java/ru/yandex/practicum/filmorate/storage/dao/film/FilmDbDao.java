@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.dao.film;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -20,6 +21,7 @@ import java.util.Objects;
 import static java.lang.String.format;
 
 @Slf4j
+@Primary
 @Repository
 @RequiredArgsConstructor
 public class FilmDbDao implements FilmDao {
