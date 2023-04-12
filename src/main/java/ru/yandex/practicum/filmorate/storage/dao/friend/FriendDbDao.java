@@ -6,6 +6,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.notfound.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exeption.notfound.FriendNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.validate.FriendAlreadyExistException;
 
 import java.util.List;
@@ -75,9 +76,9 @@ public class FriendDbDao implements FriendDao {
             case 4:
             case 5:
                 log.info("user_id={} не был другом с id={}", userId, friendId);
-                throw new FriendAlreadyExistException(format("user_id=%d не был другом с id=%d", userId, friendId));
+                throw new FriendNotFoundException(format("user_id=%d не был другом с id=%d", userId, friendId));
             default:
-                throw new FilmNotFoundException("неизвестная команда добавления фильма");
+                throw new FriendNotFoundException("неизвестная команда добавления фильма");
         }
 
     }
