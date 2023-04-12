@@ -42,21 +42,24 @@ public class FilmDbDao implements FilmDao {
                 film.getMpa().getId());
 
 
-        Film result = jdbcTemplate.
-                queryForObject(format(
-                        "SELECT film_id, f.name as name, description, release_date, " +
-                                "           duration_in_minutes, f.mpa_rating_id as mpa_rating_id, fm.name as mpa_name " +
-                                "FROM films as f LEFT OUTER JOIN mpa_ratings as fm ON f.mpa_rating_id = fm.mpa_rating_id  " +
-                                "WHERE f.name='%s' " +
-                                "AND description='%s' " +
-                                "AND release_date='%s' " +
-                                "AND duration_in_minutes=%d " +
-                                "AND f.mpa_rating_id=%d",
-                        film.getName(),
-                        film.getDescription(),
-                        Date.valueOf(film.getReleaseDate()),
-                        film.getDuration(),
-                        film.getMpa().getId()), new FilmMapper());
+        Film result = jdbcTemplate.queryForObject(format(
+                "SELECT film_id, f.name as name, description, release_date, " +
+                        "            duration_in_minutes," +
+                        "            f.mpa_rating_id as mpa_rating_id," +
+                        "            fm.name as mpa_name " +
+                        "FROM films as f " +
+                        "LEFT OUTER JOIN mpa_ratings as fm " +
+                        "ON f.mpa_rating_id = fm.mpa_rating_id  " +
+                        "WHERE f.name='%s' " +
+                        "AND description='%s' " +
+                        "AND release_date='%s' " +
+                        "AND duration_in_minutes=%d " +
+                        "AND f.mpa_rating_id=%d",
+                film.getName(),
+                film.getDescription(),
+                Date.valueOf(film.getReleaseDate()),
+                film.getDuration(),
+                film.getMpa().getId()), new FilmMapper());
         return result;
     }
 
@@ -87,9 +90,15 @@ public class FilmDbDao implements FilmDao {
     public Film showFilmById(int id) {
         try {
             Film film = jdbcTemplate.queryForObject(format(
-                    "SELECT film_id, f.name as name, description, release_date, " +
-                            "           duration_in_minutes, f.mpa_rating_id as mpa_rating_id, fm.name as mpa_name " +
-                            "FROM films as f LEFT OUTER JOIN mpa_ratings as fm ON f.mpa_rating_id = fm.mpa_rating_id  " +
+                    "SELECT film_id, f.name as name, " +
+                            "           description, " +
+                            "           release_date, " +
+                            "           duration_in_minutes, " +
+                            "           f.mpa_rating_id as mpa_rating_id, " +
+                            "           fm.name as mpa_name " +
+                            "FROM films as f " +
+                            "LEFT OUTER JOIN mpa_ratings as fm " +
+                            "ON f.mpa_rating_id = fm.mpa_rating_id  " +
                             "WHERE f.film_id=%d ", id), new FilmMapper());
             return film;
         } catch (EmptyResultDataAccessException e) {
@@ -125,7 +134,9 @@ public class FilmDbDao implements FilmDao {
             Film nameFilm = (jdbcTemplate.queryForObject(format(
                     "SELECT film_id, f.name as name, description, release_date, " +
                             "           duration_in_minutes, f.mpa_rating_id as mpa_rating_id, fm.name as mpa_name " +
-                            "FROM films as f LEFT OUTER JOIN mpa_ratings as fm ON f.mpa_rating_id = fm.mpa_rating_id  " +
+                            "FROM films as f " +
+                            "LEFT OUTER JOIN mpa_ratings as fm " +
+                            "ON f.mpa_rating_id = fm.mpa_rating_id  " +
                             "WHERE f.name= '%s' ", film.getName()), new FilmMapper()));
 
             log.error("Фильм в именем - {} уже имеет ID - {}",
@@ -157,7 +168,9 @@ public class FilmDbDao implements FilmDao {
             Film nameFilm = jdbcTemplate.queryForObject(format(
                     "SELECT film_id, f.name as name, description, release_date, " +
                             "           duration_in_minutes, f.mpa_rating_id as mpa_rating_id, fm.name as mpa_name " +
-                            "FROM films as f LEFT OUTER JOIN mpa_ratings as fm ON f.mpa_rating_id = fm.mpa_rating_id  " +
+                            "FROM films as f " +
+                            "LEFT OUTER JOIN mpa_ratings as fm " +
+                            "ON f.mpa_rating_id = fm.mpa_rating_id  " +
                             "WHERE f.name= '%s' ", film.getName()), new FilmMapper());
 
             if (nameFilm.getId() != film.getId()) {
