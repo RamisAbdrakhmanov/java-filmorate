@@ -13,6 +13,7 @@ public class FilmMapper implements RowMapper<Film> {
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
         Mpa mpa = new Mpa();
         mpa.setId(rs.getInt("mpa_rating_id"));
+        mpa.setName(rs.getString("mpa_name"));
 
         Film film = new Film();
         film.setId(rs.getInt("film_id"));

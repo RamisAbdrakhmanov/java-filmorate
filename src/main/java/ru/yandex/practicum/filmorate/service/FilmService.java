@@ -85,7 +85,6 @@ public class FilmService {
     }
 
     private void collectorFilm(Film film) {
-        film.setMpa(mpaDao.showById(film.getMpa().getId()));
         film.setGenres(genreDao.getGenres(film.getId()));
     }
 }
