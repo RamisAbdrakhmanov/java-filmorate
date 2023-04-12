@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.storage.dao.film;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exeption.not_found.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exeption.notfound.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.validate.DateReleaseException;
 import ru.yandex.practicum.filmorate.exeption.validate.FilmNameAlreadyExistException;
 import ru.yandex.practicum.filmorate.model.Film;

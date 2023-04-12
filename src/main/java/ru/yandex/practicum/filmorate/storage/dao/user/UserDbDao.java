@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exeption.not_found.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exeption.notfound.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.validate.FilmNameAlreadyExistException;
 import ru.yandex.practicum.filmorate.exeption.validate.UserEmailAlreadyExistException;
 import ru.yandex.practicum.filmorate.exeption.validate.UserIdNotNullException;

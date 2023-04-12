@@ -44,8 +44,9 @@ CREATE TABLE IF NOT EXISTS users
 CREATE TABLE IF NOT EXISTS friends
 (
     user_id   BIGINT REFERENCES users (user_id),
-    friend_id INTEGER REFERENCES users (user_id),
-    status    BOOLEAN,
+    friend_id      INTEGER REFERENCES users (user_id),
+    status_user    BOOLEAN,
+    status_friend  BOOLEAN,
     PRIMARY KEY (user_id, friend_id)
 );
 
