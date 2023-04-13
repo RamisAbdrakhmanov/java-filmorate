@@ -1,19 +1,19 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.storage.dao.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exeption.DateReleaseException;
-import ru.yandex.practicum.filmorate.exeption.FilmNameAlreadyExistException;
-import ru.yandex.practicum.filmorate.exeption.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exeption.notfound.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exeption.validate.DateReleaseException;
+import ru.yandex.practicum.filmorate.exeption.validate.FilmNameAlreadyExistException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 import java.util.*;
 
-@Component
 @Slf4j
-public class InMemoryFilmStorage implements FilmStorage {
+@Component
+public class InMemoryFilmStorage implements FilmDao {
     Map<Integer, Film> films;
     Set<String> nameFilms;
 

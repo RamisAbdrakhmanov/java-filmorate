@@ -1,19 +1,19 @@
-package ru.yandex.practicum.filmorate.storage.user;
+package ru.yandex.practicum.filmorate.storage.dao.user;
 
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exeption.UserEmailAlreadyExistException;
-import ru.yandex.practicum.filmorate.exeption.UserLoginAlreadyExistException;
-import ru.yandex.practicum.filmorate.exeption.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exeption.notfound.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exeption.validate.UserEmailAlreadyExistException;
+import ru.yandex.practicum.filmorate.exeption.validate.UserLoginAlreadyExistException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
 
-@Component
 @Slf4j
-public class InMemoryUserStorage implements UserStorage {
+@Component
+public class InMemoryUserStorage implements UserDao {
     private final Map<Integer, User> users;
     private final Set<String> logins;
     private final Set<String> emails;
