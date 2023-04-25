@@ -27,7 +27,7 @@ public class LikeDbDao implements LikeDao {
                     + "VALUES (?, ?)", filmID, userID);
         } catch (EmptyResultDataAccessException e) {
             log.error("Не возможно найти film с id - {}.(ну или user(-_-))", filmID);
-            throw new MpaNotFoundException(format("Не возможно найти film с id - %d.(ну или user(-_-))", filmID));
+            throw new LikeNotFoundException(format("Не возможно найти film с id - %d.(ну или user(-_-))", filmID));
         }
     }
 

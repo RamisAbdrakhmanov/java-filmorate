@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Builder
 public class User {
 
-    private int id;
+    private Integer id;
     @Email(message = "It's not email.")
     private String email;
     @NotBlank(message = "User login cannot be empty and contains spaces.")
