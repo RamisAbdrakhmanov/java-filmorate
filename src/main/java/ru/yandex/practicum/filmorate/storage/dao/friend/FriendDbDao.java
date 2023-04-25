@@ -46,7 +46,7 @@ public class FriendDbDao implements FriendDao {
                         "VALUES(?, ?, ?, ?)", userId, friendId, true, false);
                 break;
             default:
-                throw new FilmNotFoundException("неизвестная команда добавления фильма");
+                throw new FilmNotFoundException("неизвестная команда добавления друзей");
         }
 
     }
@@ -78,7 +78,7 @@ public class FriendDbDao implements FriendDao {
                 log.info("user_id={} не был другом с id={}", userId, friendId);
                 throw new FriendNotFoundException(format("user_id=%d не был другом с id=%d", userId, friendId));
             default:
-                throw new FriendNotFoundException("неизвестная команда добавления фильма");
+                throw new FriendNotFoundException("неизвестная команда добавления друзей");
         }
 
     }

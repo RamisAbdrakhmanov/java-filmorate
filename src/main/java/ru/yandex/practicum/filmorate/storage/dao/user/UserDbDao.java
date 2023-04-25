@@ -104,7 +104,7 @@ public class UserDbDao implements UserDao {
     private void checkAdd(User user) {
         log.info("проверка на добавление user - {}", user);
 
-        if (user.getId() != 0) {
+        if (user.getId() != null) {
             log.error("user_id не должно иметь значение");
             throw new UserIdNotNullException("user_id не должно иметь значение");
         }
