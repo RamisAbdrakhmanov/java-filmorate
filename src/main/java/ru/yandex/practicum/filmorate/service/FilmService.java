@@ -60,17 +60,17 @@ public class FilmService {
 
         List<Film> filteredFilms = new ArrayList<>(films);
 
+        if (year != null) {
+            filteredFilms.removeIf(f -> f.getReleaseDate().getYear() != year);
+        }
+
         if (genreId != null) {
             Genre genre = genreDao.showGenreById(genreId);
             if (genre == null) {
-                throw new GenreNotFoundException("Жанра с таким id не найдено");
+                filteredFilms.clear();
             } else {
                 filteredFilms.removeIf(f -> !f.getGenres().contains(genre));
             }
-        }
-
-        if (year != null) {
-            filteredFilms.removeIf(f -> f.getReleaseDate().getYear() != year);
         }
 
         if (filteredFilms.isEmpty()) {
