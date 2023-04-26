@@ -67,7 +67,7 @@ public class FilmService {
         if (genreId != null) {
             Genre genre = genreDao.showGenreById(genreId);
             if (genre == null) {
-                filteredFilms.clear();
+                throw new FilmNotFoundException("Фильмов по заданному фильтру не найдено");
             } else {
                 filteredFilms.removeIf(f -> !f.getGenres().contains(genre));
             }
@@ -79,6 +79,7 @@ public class FilmService {
 
         return filteredFilms.stream().limit(count).collect(Collectors.toList());
     }
+
 
     public Film showFilmById(int id) {
         Film film = filmDao.showFilmById(id);
