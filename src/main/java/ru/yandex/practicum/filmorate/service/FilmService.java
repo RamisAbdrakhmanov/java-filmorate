@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exeption.notfound.MpaNotFoundException;
+import ru.yandex.practicum.filmorate.exeption.notfound.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.film.FilmDao;
 import ru.yandex.practicum.filmorate.storage.dao.genre.GenreDao;
@@ -86,5 +88,9 @@ public class FilmService {
 
     private void collectorFilm(Film film) {
         film.setGenres(genreDao.getGenres(film.getId()));
+    }
+
+    public List<Film> getCommonFilms(int userId, int friendId) throws UserNotFoundException, MpaNotFoundException {
+        return filmDao.getCommonFilms(userId, friendId);
     }
 }

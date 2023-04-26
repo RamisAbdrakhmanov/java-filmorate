@@ -70,4 +70,9 @@ public class FilmController {
         filmService.deleteLike(filmId, userId);
     }
 
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam int userId, @RequestParam int friendId) {
+        return filmService.getCommonFilms(userId, friendId);
+    }
+
 }

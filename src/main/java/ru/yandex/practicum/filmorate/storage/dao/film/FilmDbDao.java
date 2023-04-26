@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.notfound.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.validate.DateReleaseException;
@@ -12,11 +13,18 @@ import ru.yandex.practicum.filmorate.exeption.validate.FilmIdNotNullException;
 import ru.yandex.practicum.filmorate.exeption.validate.FilmNameAlreadyExistException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmMapper;
+import ru.yandex.practicum.filmorate.model.Mpa;
+
 
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -183,4 +191,24 @@ public class FilmDbDao implements FilmDao {
         }
     }
 
+    static Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
+        int id = rs.getInt("film_id");
+        String name = rs.getString("name");
+        String description = rs.getString("description");
+        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
+        long duration = rs.getLong("duration_in_minutes");
+        Mpa mpa = new Mpa(rs.getInt("mpa_ratings.mpa_rating_id"), rs.getString("mpa_ratings.name"));
+        return new Film(id, name, description, releaseDate, duration, mpa, new HashSet<>());
+    }
+
+    @Override
+    public List<Film> getCommonFilms(int userId, int friendId) {
+        String sql = "SELECT f.*, M.* " +
+                "FROM FILM_LIKES " +
+                "JOIN FILM_LIKES fl ON fl.FILM_ID = FILM_LIKES.FILM_ID " +
+                "JOIN FILMS f on f.film_id = fl.film_id " +
+                "JOIN MPA_RATINGS M on f.mpa_rating_id = M.MPA_RATING_ID " +
+                "WHERE fl.USER_ID = ? AND FILM_LIKES.USER_ID = ?";
+        return jdbcTemplate.query(sql, FilmDbDao::makeFilm, userId, friendId);
+    }
 }
