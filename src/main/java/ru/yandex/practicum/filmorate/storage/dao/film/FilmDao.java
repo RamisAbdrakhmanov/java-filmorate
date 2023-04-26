@@ -16,5 +16,7 @@ public interface FilmDao {
 
     Film changeFilm(Film film);
 
+    List<Integer> showUsersLikedFilms(int id);
+
     void deleteFilmById(int id);
 }

@@ -6,7 +6,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.notfound.LikeNotFoundException;
-import ru.yandex.practicum.filmorate.exeption.notfound.MpaNotFoundException;
+import ru.yandex.practicum.filmorate.exeption.notfound.UserNotFoundException;
 
 import java.util.List;
 
@@ -57,5 +57,24 @@ public class LikeDbDao implements LikeDao {
         return filmId;
     }
 
-
+    @Override
+    public List<Integer> getRecommendedList(int userID) {
+        log.info("Запрос на вывод списка фильмов для перескающихся по лайкам с пользователем {}", userID);
+        try {
+            return jdbcTemplate.queryForList(format("SELECT fl2.FILM_ID " +
+                    "FROM film_likes fl2 " +
+                    "WHERE fl2.user_id = " +
+                    "(SELECT fl1.user_id " +
+                    "FROM film_likes fl1 " +
+                    "WHERE fl1.user_id <> %d AND fl1.film_id IN " +
+                    "(SELECT fl.film_id " +
+                    "FROM film_likes fl " +
+                    "WHERE user_id = %d) " +
+                    "GROUP BY fl1.user_id " +
+                    "ORDER BY COUNT(fl1.film_id) DESC " +
+                    "LIMIT 1);", userID, userID), Integer.class);
+        } catch (UserNotFoundException e) {
+            throw new UserNotFoundException(format("Пользователь с id %d не найден", userID));
+        }
+    }
 }
