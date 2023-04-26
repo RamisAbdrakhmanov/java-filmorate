@@ -14,7 +14,6 @@ import ru.yandex.practicum.filmorate.storage.dao.user.UserDao;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.function.Predicate;
 
 @Service
 public class FilmService {
