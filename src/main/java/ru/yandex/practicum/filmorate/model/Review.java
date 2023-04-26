@@ -1,6 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -23,7 +26,6 @@ public class Review implements Comparable<Review> {
     @NotNull
     Integer filmId;
     Integer useful;
-
 
     @Override
     public int compareTo(Review o) {
