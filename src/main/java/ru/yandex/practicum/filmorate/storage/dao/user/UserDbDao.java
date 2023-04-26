@@ -17,6 +17,7 @@ import ru.yandex.practicum.filmorate.storage.mapper.UserMapper;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Objects;
 
 import static java.lang.String.format;
 
@@ -138,6 +139,7 @@ public class UserDbDao implements UserDao {
             log.error("Невозможно добавить user. User c email - {} уже имеет ID - {}",
                     emailUser.getEmail(),
                     emailUser.getId());
+
             throw new UserEmailAlreadyExistException(
                     String.format("Невозможно добавить user. User c email - %s уже имеет ID - %s",
                             emailUser.getEmail(),
@@ -162,7 +164,7 @@ public class UserDbDao implements UserDao {
                     + "FROM users "
                     + "WHERE login= '%s'", user.getLogin()), new UserMapper());
 
-            if (loginUser.getId() != user.getId()) {
+            if (!Objects.equals(loginUser.getId(), user.getId())) {
                 log.error("Невозможно изменить login. User c login - {} уже имеет ID - {}",
                         loginUser.getLogin(),
                         loginUser.getId());
@@ -183,7 +185,7 @@ public class UserDbDao implements UserDao {
                     + "FROM users "
                     + "WHERE name= '%s'", user.getEmail()), new UserMapper());
 
-            if (emailUser.getId() != user.getId()) {
+            if (!Objects.equals(emailUser.getId(), user.getId())) {
                 log.error("Невозможно изменить email. User c email - {} уже имеет ID - {}",
                         emailUser.getEmail(),
                         emailUser.getId());
