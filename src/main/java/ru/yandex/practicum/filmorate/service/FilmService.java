@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exeption.notfound.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.dao.film.FilmDao;
@@ -66,19 +65,14 @@ public class FilmService {
         if (genreId != null) {
             Genre genre = genreDao.showGenreById(genreId);
             if (genre == null) {
-                throw new FilmNotFoundException("Фильмов по заданному фильтру не найдено");
+                return new ArrayList<>();
             } else {
                 filteredFilms.removeIf(f -> !f.getGenres().contains(genre));
             }
         }
 
-        if (filteredFilms.isEmpty()) {
-            throw new FilmNotFoundException("Фильмов по заданному фильтру не найдено");
-        }
-
         return filteredFilms.stream().limit(count).collect(Collectors.toList());
     }
-
 
     public Film showFilmById(int id) {
         Film film = filmDao.showFilmById(id);
