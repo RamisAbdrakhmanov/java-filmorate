@@ -113,14 +113,11 @@ public class ReviewDbDao implements ReviewDao {
                             review.getUserId(),
                             review.getFilmId()),
                     Integer.class);
-
-            if(check != 0) {
+            if (check != 0) {
                 throw new ReviewValidateException("Ошибка валидация: пользователь уже оставлял отзыв к этому фильму.");
             }
         } catch (EmptyResultDataAccessException ignored) {
-
         }
-
     }
 
     /**

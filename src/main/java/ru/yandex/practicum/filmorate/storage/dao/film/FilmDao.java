@@ -18,6 +18,6 @@ public interface FilmDao {
 
     void deleteFilmById(int id);
 
-    List<Film> getCommonFilms (int userId, int friendId);
+    List<Film> getCommonFilms(int userId, int friendId);
 
 }
