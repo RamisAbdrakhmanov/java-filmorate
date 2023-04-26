@@ -56,6 +56,4 @@ public class LikeDbDao implements LikeDao {
                 + "LIMIT %d", count), Integer.class);
         return filmId;
     }
-
-
 }

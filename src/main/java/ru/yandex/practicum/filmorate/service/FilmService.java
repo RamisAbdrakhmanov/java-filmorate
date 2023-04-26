@@ -44,14 +44,22 @@ public class FilmService {
         likeDao.deleteLike(filmId, userId);
     }
 
-    public List<Film> showPopularFilms(int count) {
+    public List<Film> showPopularFilms(int count, Integer genreId, Integer year) {
         List<Integer> filmIds = likeDao.showLikesSort(count);
-        Set<Film> films = new LinkedHashSet<>();
+        final Set<Film> films = new LinkedHashSet<>();
         filmIds.forEach(s -> films.add(filmDao.showFilmById(s)));
-        films.addAll(showFilms());
-        return films.stream().limit(count).collect(Collectors.toList());
+        if (films.isEmpty()) {
+            films.addAll(showFilms());
+        }
+        Set<Film> filteredFilms = films;
+        if (genreId != null && year != null) {
+            filteredFilms = films.stream()
+                    .filter(f -> f.getGenres().contains(genreDao.showGenreById(genreId))
+                            && f.getReleaseDate().getYear() == year)
+                    .collect(Collectors.toSet());
+        }
+        return filteredFilms.stream().limit(count).collect(Collectors.toList());
     }
-
 
     public Film showFilmById(int id) {
         Film film = filmDao.showFilmById(id);

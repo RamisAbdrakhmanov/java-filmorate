@@ -32,7 +32,6 @@ public class FilmController {
         return filmService.showFilms();
     }
 
-
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
         log.info("Запросто на добавление элемента.");
@@ -53,11 +52,16 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> showPopularFilms(@RequestParam(defaultValue = "10", required = false) int count) {
+    public List<Film> showPopularFilms(@RequestParam(defaultValue = "10", required = false) int count,
+                                       @RequestParam(required = false) Integer genreId,
+                                       @RequestParam(required = false) Integer year) {
         if (count <= 0) {
             throw new IncorrectParamException("Count param is incorrect.");
         }
-        return filmService.showPopularFilms(count);
+        if ((genreId == null && year != null) || (genreId != null && year == null)) {
+            throw new IllegalArgumentException("Необходимы оба параметра запроса: genreId и year");
+        }
+        return filmService.showPopularFilms(count, genreId, year);
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -69,5 +73,4 @@ public class FilmController {
     public void deleteLike(@PathVariable(name = "id") int filmId, @PathVariable int userId) {
         filmService.deleteLike(filmId, userId);
     }
-
 }
