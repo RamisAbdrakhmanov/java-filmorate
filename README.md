@@ -1,7 +1,7 @@
 # java-filmorate
 Template repository for Filmorate project. Java.
 
-![Filmorate.png](https://i.ibb.co/fGZf9jf/sql-schema.png)
+![Filmorate.png](https://i.ibb.co/XWW2s9W/sql-schema.png)
 
 https://i.ibb.co/fGZf9jf/sql-schema.png
 
