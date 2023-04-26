@@ -93,8 +93,7 @@ public class ReviewLikeDbDao implements ReviewLikeDao {
         jdbcTemplate.update("" +
                         "DELETE FROM review_likes " +
                         "WHERE review_id=? " +
-                        "AND user_id=?"
-                ,
+                        "AND user_id=?",
                 reviewId,
                 userId);
     }
