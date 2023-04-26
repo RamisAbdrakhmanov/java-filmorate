@@ -71,8 +71,16 @@ public class FilmService {
                 .limit(count)
                 .collect(Collectors.toList());
 
+        if (genreId != null) {
+            Genre genre = genreDao.showGenreById(genreId);
+            if (genre == null) {
+                throw new IllegalArgumentException("Invalid genre ID: " + genreId);
+            }
+        }
+
         return filteredFilms;
     }
+
 
     public Film showFilmById(int id) {
         Film film = filmDao.showFilmById(id);
