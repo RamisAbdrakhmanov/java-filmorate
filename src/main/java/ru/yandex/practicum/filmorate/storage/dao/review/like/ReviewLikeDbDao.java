@@ -17,12 +17,19 @@ public class ReviewLikeDbDao implements ReviewLikeDao {
 
     @Override
     public Integer getCountLikes(int reviewId) {
-        Integer count = jdbcTemplate.queryForObject(format("" +
+        Integer countTrue = jdbcTemplate.queryForObject(format("" +
                 "SELECT COUNT(*) " +
                 "FROM review_likes " +
-                "WHERE review_id=%d", reviewId
+                "WHERE review_id=%d " +
+                "AND is_like=true", reviewId
         ), Integer.class);
-        return count;
+        Integer countFalse = jdbcTemplate.queryForObject(format("" +
+                "SELECT COUNT(*) " +
+                "FROM review_likes " +
+                "WHERE review_id=%d " +
+                "AND is_like=false", reviewId
+        ), Integer.class);
+        return countTrue - countFalse;
     }
 
     @Override
