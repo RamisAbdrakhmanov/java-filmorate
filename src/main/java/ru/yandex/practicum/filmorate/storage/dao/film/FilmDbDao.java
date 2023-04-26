@@ -119,7 +119,7 @@ public class FilmDbDao implements FilmDao {
 
     private void checkAdd(Film film) {
 
-        if (film.getId() != 0) {
+        if (film.getId() != null) {
             log.error("ID не должен быть указан при добавление!");
             throw new FilmIdNotNullException("ID не должен быть указан при добавление!");
         }

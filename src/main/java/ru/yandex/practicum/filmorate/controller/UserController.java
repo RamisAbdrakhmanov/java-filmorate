@@ -11,10 +11,9 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import javax.validation.Valid;
 import java.util.List;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/users")
-@Slf4j
 @ResponseStatus(HttpStatus.OK)
 public class UserController {
     private final UserService userService;
