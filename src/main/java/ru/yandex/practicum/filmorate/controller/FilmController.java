@@ -50,19 +50,6 @@ public class FilmController {
         filmService.deleteFilmById(id);
     }
 
-/*    @GetMapping("/popular")
-    public List<Film> showPopularFilms(@RequestParam(defaultValue = "10", required = false) int count,
-                                       @RequestParam(required = false) Integer genreId,
-                                       @RequestParam(required = false) Integer year) {
-        if (count <= 0) {
-            throw new IncorrectParamException("Count param is incorrect.");
-        }
-        if ((genreId == null && year != null) || (genreId != null && year == null)) {
-            throw new IllegalArgumentException("Необходимы оба параметра запроса: genreId и year");
-        }
-        return filmService.showPopularFilms(count, genreId, year);
-    }*/
-
     @GetMapping("/popular")
     public List<Film> showPopularFilms(@RequestParam(defaultValue = "10", required = false) int count,
                                        @RequestParam(required = false) Integer genreId,
