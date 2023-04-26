@@ -65,6 +65,7 @@ public class UserService {
     }
 
     public List<Film> getUsersRecommendations(int userId) {
+        checkUser(userId);
         List<Integer> allFilmsList = likeDao.getRecommendedList(userId);
         List<Integer> usersFilms = filmDao.showUsersLikedFilms(userId);
         allFilmsList.removeAll(usersFilms);

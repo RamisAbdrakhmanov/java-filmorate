@@ -60,7 +60,6 @@ public class LikeDbDao implements LikeDao {
     @Override
     public List<Integer> getRecommendedList(int userID) {
         log.info("Запрос на вывод списка фильмов для перескающихся по лайкам с пользователем {}", userID);
-        try {
             return jdbcTemplate.queryForList(format("SELECT fl2.FILM_ID " +
                     "FROM film_likes fl2 " +
                     "WHERE fl2.user_id = " +
@@ -73,8 +72,5 @@ public class LikeDbDao implements LikeDao {
                     "GROUP BY fl1.user_id " +
                     "ORDER BY COUNT(fl1.film_id) DESC " +
                     "LIMIT 1);", userID, userID), Integer.class);
-        } catch (UserNotFoundException e) {
-            throw new UserNotFoundException(format("Пользователь с id %d не найден", userID));
-        }
     }
 }
