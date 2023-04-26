@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exeption.notfound.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exeption.notfound.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.dao.film.FilmDao;
@@ -57,30 +59,27 @@ public class FilmService {
             films.addAll(showFilms());
         }
 
-        Predicate<Film> genreFilter = (genreId != null) ?
-                f -> f.getGenres().stream().anyMatch(genre -> genre.getId().equals(genreId)) :
-                f -> true;
-
-        Predicate<Film> yearFilter = (year != null) ?
-                f -> f.getReleaseDate().getYear() == year :
-                f -> true;
-
-        List<Film> filteredFilms = films.stream()
-                .filter(genreFilter)
-                .filter(yearFilter)
-                .limit(count)
-                .collect(Collectors.toList());
+        List<Film> filteredFilms = new ArrayList<>(films);
 
         if (genreId != null) {
             Genre genre = genreDao.showGenreById(genreId);
             if (genre == null) {
-                throw new IllegalArgumentException("Invalid genre ID: " + genreId);
+                throw new GenreNotFoundException("Жанра с таким id не найдено");
+            } else {
+                filteredFilms.removeIf(f -> !f.getGenres().contains(genre));
             }
         }
 
-        return filteredFilms;
-    }
+        if (year != null) {
+            filteredFilms.removeIf(f -> f.getReleaseDate().getYear() != year);
+        }
 
+        if (filteredFilms.isEmpty()) {
+            throw new FilmNotFoundException("Фильмов по заданному фильтру не найдено");
+        }
+
+        return filteredFilms.stream().limit(count).collect(Collectors.toList());
+    }
 
     public Film showFilmById(int id) {
         Film film = filmDao.showFilmById(id);
