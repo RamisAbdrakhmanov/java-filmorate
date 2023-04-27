@@ -2,17 +2,17 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exeption.notfound.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.director.DirectorDao;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.dao.film.FilmDao;
 import ru.yandex.practicum.filmorate.storage.dao.genre.GenreDao;
 import ru.yandex.practicum.filmorate.storage.dao.like.LikeDao;
 import ru.yandex.practicum.filmorate.storage.dao.mpa.MpaDao;
 import ru.yandex.practicum.filmorate.storage.dao.user.UserDao;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,12 +47,35 @@ public class FilmService {
         likeDao.deleteLike(filmId, userId);
     }
 
-    public List<Film> showPopularFilms(int count) {
+    public List<Film> showPopularFilms(int count, Integer genreId, Integer year) {
         List<Integer> filmIds = likeDao.showLikesSort(count);
         Set<Film> films = new LinkedHashSet<>();
-        filmIds.forEach(s -> films.add(filmDao.showFilmById(s)));
-        films.addAll(showFilms());
-        return films.stream().limit(count).collect(Collectors.toList());
+        for (Integer filmId : filmIds) {
+            Film film = filmDao.showFilmById(filmId);
+            if (film != null) {
+                films.add(film);
+            }
+        }
+        if (films.isEmpty()) {
+            films.addAll(showFilms());
+        }
+
+        List<Film> filteredFilms = new ArrayList<>(films);
+
+        if (year != null) {
+            filteredFilms.removeIf(f -> f.getReleaseDate().getYear() != year);
+        }
+
+        if (genreId != null) {
+            Genre genre = genreDao.showGenreById(genreId);
+            if (genre == null) {
+                throw new GenreNotFoundException("Жанр с данным id не найден");
+            } else {
+                filteredFilms.removeIf(f -> !f.getGenres().contains(genre));
+            }
+        }
+
+        return filteredFilms.stream().limit(count).collect(Collectors.toList());
     }
 
     public Film showFilmById(int id) {
