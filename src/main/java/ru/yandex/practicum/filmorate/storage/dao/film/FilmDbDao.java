@@ -12,14 +12,9 @@ import ru.yandex.practicum.filmorate.exeption.validate.FilmIdNotNullException;
 import ru.yandex.practicum.filmorate.exeption.validate.FilmNameAlreadyExistException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmMapper;
-import ru.yandex.practicum.filmorate.model.Mpa;
-
 
 import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -183,7 +178,7 @@ public class FilmDbDao implements FilmDao {
                             "ON f.mpa_rating_id = fm.mpa_rating_id  " +
                             "WHERE f.name= '%s' ", film.getName()), new FilmMapper());
 
-            if (nameFilm.getId() != film.getId()) {
+            if (!Objects.equals(nameFilm.getId(), film.getId())) {
                 log.error("Фильм в именем - {} уже имеет ID - {}", nameFilm.getName(), nameFilm.getId());
                 throw new FilmNameAlreadyExistException(
                         String.format("Фильм в именем - %s уже имеет ID - %s", nameFilm.getName(), nameFilm.getId()));
@@ -191,16 +186,6 @@ public class FilmDbDao implements FilmDao {
         } catch (EmptyResultDataAccessException e) {
             log.info("Фильм с именем {} отсутствует!", film.getName());
         }
-    }
-
-    static Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
-        int id = rs.getInt("film_id");
-        String name = rs.getString("name");
-        String description = rs.getString("description");
-        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
-        long duration = rs.getLong("duration_in_minutes");
-        Mpa mpa = new Mpa(rs.getInt("mpa_ratings.mpa_rating_id"), rs.getString("mpa_ratings.name"));
-        return new Film(id, name, description, releaseDate, duration, mpa, new HashSet<>());
     }
 
     @Override
@@ -211,6 +196,6 @@ public class FilmDbDao implements FilmDao {
                 "JOIN FILMS f on f.film_id = fl.film_id " +
                 "JOIN MPA_RATINGS M on f.mpa_rating_id = M.MPA_RATING_ID " +
                 "WHERE fl.USER_ID = ? AND FILM_LIKES.USER_ID = ?";
-        return jdbcTemplate.query(sql, FilmDbDao::makeFilm, userId, friendId);
+        return jdbcTemplate.query(sql, new FilmMapper(), userId, friendId);
     }
 }
