@@ -65,6 +65,11 @@ public class InMemoryFilmStorage implements FilmDao {
 
     }
 
+
+    public List<Film> getCommonFilms(int userId, int friendId) {
+        return null;
+    }
+
     private void checkFilm(Film film) {
 
         Film filmCheck = null;

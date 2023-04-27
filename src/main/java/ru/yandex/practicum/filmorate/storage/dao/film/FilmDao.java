@@ -19,4 +19,7 @@ public interface FilmDao {
     List<Integer> showUsersLikedFilms(int id);
 
     void deleteFilmById(int id);
+
+    List<Film> getCommonFilms(int userId, int friendId);
+
 }

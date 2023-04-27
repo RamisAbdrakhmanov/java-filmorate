@@ -128,7 +128,6 @@ public class ReviewDbDao implements ReviewDao {
         if (check != 0) {
             throw new ReviewValidateException("Ошибка валидация: пользователь уже оставлял отзыв к этому фильму.");
         }
-
     }
 
     /**
