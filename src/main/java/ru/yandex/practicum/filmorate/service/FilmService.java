@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.dao.director.DirectorDao;
 import ru.yandex.practicum.filmorate.storage.dao.film.FilmDao;
 import ru.yandex.practicum.filmorate.storage.dao.genre.GenreDao;
 import ru.yandex.practicum.filmorate.storage.dao.like.LikeDao;
@@ -22,14 +23,16 @@ public class FilmService {
     private final GenreDao genreDao;
     private final MpaDao mpaDao;
     private final LikeDao likeDao;
+    private final DirectorDao directorDao;
 
     @Autowired
-    public FilmService(FilmDao filmDao, UserDao userDao, GenreDao genreDao, MpaDao mpaDao, LikeDao likeDao) {
+    public FilmService(FilmDao filmDao, UserDao userDao, GenreDao genreDao, MpaDao mpaDao, LikeDao likeDao, DirectorDao directorDao) {
         this.filmDao = filmDao;
         this.userDao = userDao;
         this.genreDao = genreDao;
         this.mpaDao = mpaDao;
         this.likeDao = likeDao;
+        this.directorDao = directorDao;
     }
 
     public void addLike(int filmId, int userId) {
@@ -52,7 +55,6 @@ public class FilmService {
         return films.stream().limit(count).collect(Collectors.toList());
     }
 
-
     public Film showFilmById(int id) {
         Film film = filmDao.showFilmById(id);
         collectorFilm(film);
@@ -68,14 +70,15 @@ public class FilmService {
     public Film addFilm(Film film) {
         Film filmGenre = filmDao.addFilm(film);
         genreDao.addGenres(filmGenre.getId(), film.getGenres());
+        directorDao.addFilmDirectors(filmGenre.getId(), film.getDirectors());
         collectorFilm(filmGenre);
         return filmGenre;
     }
 
-
     public Film changeFilm(Film film) {
         Film filmGenre = filmDao.changeFilm(film);
         genreDao.updateGenres(filmGenre.getId(), film.getGenres());
+        directorDao.updateFilmDirectors(filmGenre.getId(), film.getDirectors());
         collectorFilm(filmGenre);
         return filmGenre;
     }
@@ -84,7 +87,14 @@ public class FilmService {
         filmDao.deleteFilmById(id);
     }
 
+    public List<Film> getDirectorFilms(int directorId, String sorBy) {
+        return directorDao.getDirectorFilms(directorId, sorBy).stream()
+                .peek(this::collectorFilm)
+                .collect(Collectors.toList());
+    }
+
     private void collectorFilm(Film film) {
         film.setGenres(genreDao.getGenres(film.getId()));
+        film.setDirectors(directorDao.getFilmDirectors(film.getId()));
     }
 }
