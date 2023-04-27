@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.storage.mapper.ReviewMapper;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -24,18 +25,29 @@ public class ReviewDbDao implements ReviewDao {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<Review> getReviews() {
-        return null;
+    public List<Review> getReviews(int filmId, int count) {
+        List<Review> reviews;
+        if (filmId != 0) {
+            reviews = jdbcTemplate.query(format("" +
+                    "SELECT review_id, user_id, film_id, content, is_positive " +
+                    "FROM reviews " +
+                    "WHERE film_id=%d", filmId), new ReviewMapper());
+        } else {
+            reviews = jdbcTemplate.query("" +
+                    "SELECT review_id, user_id, film_id, content, is_positive " +
+                    "FROM reviews ", new ReviewMapper());
+        }
+        return reviews.stream().limit(count).collect(Collectors.toList());
     }
 
     @Override
     public Review getReview(int reviewId) {
         log.info("Показать review по id - {}", reviewId);
         try {
-            Review review = jdbcTemplate.queryForObject(format(""
-                    + "SELECT review_id, user_id, film_id, content, is_positive "
-                    + "FROM reviews "
-                    + "WHERE review_id = %d", reviewId), new ReviewMapper());
+            Review review = jdbcTemplate.queryForObject(format("" +
+                    "SELECT review_id, user_id, film_id, content, is_positive " +
+                    "FROM reviews " +
+                    "WHERE review_id = %d", reviewId), new ReviewMapper());
 
             return review;
         } catch (EmptyResultDataAccessException e) {
@@ -49,9 +61,9 @@ public class ReviewDbDao implements ReviewDao {
         log.info("запрос на добавление review - {}", review);
         checkAdd(review);
 
-        jdbcTemplate.update(""
-                        + "INSERT INTO reviews ( user_id, film_id, content, is_positive) "
-                        + "VALUES ( ?,?,?,? )",
+        jdbcTemplate.update("" +
+                        "INSERT INTO reviews ( user_id, film_id, content, is_positive) " +
+                        "VALUES ( ?,?,?,? )",
                 review.getUserId(),
                 review.getFilmId(),
                 review.getContent(),
@@ -59,11 +71,10 @@ public class ReviewDbDao implements ReviewDao {
         );
 
 
-        Review getReview = jdbcTemplate.queryForObject(format(""
-                + "SELECT review_id, user_id, film_id, content, is_positive "
-                + "FROM reviews "
-                + "WHERE user_id = %d AND film_id = %d ", review.getUserId(), review.getFilmId()), new ReviewMapper());
-
+        Review getReview = jdbcTemplate.queryForObject(format("" +
+                "SELECT review_id, user_id, film_id, content, is_positive " +
+                "FROM reviews " +
+                "WHERE user_id = %d AND film_id = %d ", review.getUserId(), review.getFilmId()), new ReviewMapper());
 
         return getReview;
     }
@@ -72,10 +83,10 @@ public class ReviewDbDao implements ReviewDao {
     public Review changeReview(Review review) {
         log.info("запрос на изменение review - {}", review);
         checkChange(review);
-        jdbcTemplate.update(""
-                        + "UPDATE reviews "
-                        + "SET content=?, is_positive=? "
-                        + "WHERE review_id=? ",
+        jdbcTemplate.update("" +
+                        "UPDATE reviews " +
+                        "SET content=?, is_positive=? " +
+                        "WHERE review_id=? ",
                 review.getContent(),
                 review.getIsPositive(),
                 review.getReviewId());
@@ -86,7 +97,8 @@ public class ReviewDbDao implements ReviewDao {
     @Override
     public void deleteReview(int reviewId) {
         log.info("Удаление review");
-        jdbcTemplate.update("DELETE " +
+        jdbcTemplate.update("" +
+                        "DELETE " +
                         "FROM reviews " +
                         "WHERE review_id = ?",
                 reviewId);
@@ -104,21 +116,17 @@ public class ReviewDbDao implements ReviewDao {
             log.error("user_id не должно иметь значение");
             throw new UserIdNotNullException("user_id не должно иметь значение");
         }
-        try {
-            Integer check = jdbcTemplate.queryForObject(format(""
-                                    + "SELECT count(*) "
-                                    + "FROM reviews "
-                                    + "WHERE user_id=%d "
-                                    + "AND film_id=%d",
-                            review.getUserId(),
-                            review.getFilmId()),
-                    Integer.class);
+        Integer check = jdbcTemplate.queryForObject(format("" +
+                                "SELECT count(*) " +
+                                "FROM reviews " +
+                                "WHERE user_id=%d " +
+                                "AND film_id=%d",
+                        review.getUserId(),
+                        review.getFilmId()),
+                Integer.class);
 
-            if(check != 0) {
-                throw new ReviewValidateException("Ошибка валидация: пользователь уже оставлял отзыв к этому фильму.");
-            }
-        } catch (EmptyResultDataAccessException ignored) {
-
+        if (check != 0) {
+            throw new ReviewValidateException("Ошибка валидация: пользователь уже оставлял отзыв к этому фильму.");
         }
 
     }

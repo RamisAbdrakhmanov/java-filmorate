@@ -7,7 +7,7 @@ import java.util.List;
 
 @Component
 public interface ReviewDao {
-    List<Review> getReviews();
+    List<Review> getReviews(int filmId, int count);
 
     Review getReview(int reviewId);
 
@@ -16,4 +16,6 @@ public interface ReviewDao {
     Review changeReview(Review review);
 
     void deleteReview(int reviewId);
+
+
 }
