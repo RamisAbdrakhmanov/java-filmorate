@@ -117,6 +117,11 @@ public class FilmDbDao implements FilmDao {
         return films;
     }
 
+    @Override
+    public List<Integer> showUsersLikedFilms(int id) {
+        return jdbcTemplate.queryForList(format("SELECT film_id FROM film_likes WHERE user_id = %d", id), Integer.class);
+    }
+
     private void checkAdd(Film film) {
 
         if (film.getId() != null) {

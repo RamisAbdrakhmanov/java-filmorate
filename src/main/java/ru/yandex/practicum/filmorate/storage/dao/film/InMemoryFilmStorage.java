@@ -102,8 +102,9 @@ public class InMemoryFilmStorage implements FilmDao {
                 film.setId(filmID++);
             }
         }
-
-
     }
 
+    public List<Integer> showUsersLikedFilms(int id) {
+        return null;
+    }
 }
