@@ -70,4 +70,9 @@ public class FilmController {
         filmService.deleteLike(filmId, userId);
     }
 
+    @GetMapping("/director/{directorId}")
+    public List<Film> getDirectorFilms(@PathVariable(name = "directorId") int directorId, @RequestParam String sortBy) {
+        return filmService.getDirectorFilms(directorId, sortBy);
+    }
+
 }
