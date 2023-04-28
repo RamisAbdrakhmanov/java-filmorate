@@ -80,7 +80,7 @@ public class ReviewDbDao implements ReviewDao {
     }
 
     @Override
-    public Review changeReview(Review review) {
+    public Review updateReview(Review review) {
         log.info("запрос на изменение review - {}", review);
         checkChange(review);
         jdbcTemplate.update("" +

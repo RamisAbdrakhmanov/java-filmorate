@@ -29,6 +29,6 @@ public class Review implements Comparable<Review> {
 
     @Override
     public int compareTo(Review o) {
-        return this.getUseful() - o.getUseful();
+        return o.getUseful() - this.getUseful();
     }
 }

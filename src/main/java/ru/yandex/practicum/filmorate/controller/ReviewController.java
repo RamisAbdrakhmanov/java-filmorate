@@ -39,8 +39,8 @@ public class ReviewController {
     }
 
     @PutMapping
-    public Review changeReview(@Valid @RequestBody Review review) {
-        return reviewService.changeReview(review);
+    public Review updateReview(@Valid @RequestBody Review review) {
+        return reviewService.updateReview(review);
     }
 
     @DeleteMapping("/{reviewId}")
