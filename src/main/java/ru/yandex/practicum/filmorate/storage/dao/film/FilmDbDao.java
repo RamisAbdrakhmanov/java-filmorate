@@ -224,8 +224,8 @@ public class FilmDbDao implements FilmDao {
                             "LEFT JOIN mpa_ratings m ON f.mpa_rating_id = m.mpa_rating_id " +
                             "LEFT JOIN film_likes fl ON f.film_id = fl.film_id " +
                             "WHERE (? IS NULL OR LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%'))) " +
-                            "AND (? IS NULL OR LOWER(d.name) = LOWER(?)) " +
-                            "AND (? IS NULL OR LOWER(f.name) = LOWER(?)) " +
+                            "AND (? IS NULL OR LOWER(d.name) LIKE LOWER(?)) " +
+                            "AND (? IS NULL OR LOWER(f.name) LIKE LOWER(?)) " +
                             "GROUP BY f.film_id " +
                             "ORDER BY num_likes DESC",
                     new FilmMapper(),
