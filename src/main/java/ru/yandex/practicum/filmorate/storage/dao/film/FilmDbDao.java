@@ -156,8 +156,6 @@ public class FilmDbDao implements FilmDao {
             // иначе не нашел как мне получить или null или значение.
             log.info("Фильм с именем {} отсутствует!", film.getName());
         }
-
-
     }
 
     private void checkChange(Film film) {
