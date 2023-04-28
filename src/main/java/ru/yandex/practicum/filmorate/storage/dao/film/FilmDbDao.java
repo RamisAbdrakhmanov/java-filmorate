@@ -198,4 +198,41 @@ public class FilmDbDao implements FilmDao {
                 "WHERE fl.USER_ID = ? AND FILM_LIKES.USER_ID = ?";
         return jdbcTemplate.query(sql, new FilmMapper(), userId, friendId);
     }
+
+    @Override
+    public List<Film> searchFilms(String query, String by) {
+            String[] byValues = by != null ? by.split(",") : null;
+            String director = null;
+            String title = null;
+            if (byValues != null && byValues.length > 0) {
+                for (String byValue : byValues) {
+                    String[] keyValue = byValue.split("=");
+                    if (keyValue.length == 2) {
+                        String key = keyValue[0];
+                        String value = keyValue[1];
+                        if ("director".equals(key)) {
+                            director = value;
+                        } else if ("title".equals(key)) {
+                            title = value;
+                        }
+                    }
+                }
+            }
+            return jdbcTemplate.query(
+                    "SELECT f.*, m.name AS mpa_name, COUNT(fl.film_id) AS num_likes " +
+                            "FROM films f " +
+                            "LEFT JOIN film_directors fd ON f.film_id = fd.film_id " +
+                            "LEFT JOIN directors d ON fd.director_id = d.director_id " +
+                            "LEFT JOIN mpa_ratings m ON f.mpa_rating_id = m.mpa_rating_id " +
+                            "LEFT JOIN film_likes fl ON f.film_id = fl.film_id " +
+                            "WHERE (? IS NULL OR LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%'))) " +
+                            "AND (? IS NULL OR LOWER(d.name) = LOWER(?)) " +
+                            "AND (? IS NULL OR LOWER(f.name) = LOWER(?)) " +
+                            "GROUP BY f.film_id " +
+                            "ORDER BY num_likes DESC",
+                    new FilmMapper(),
+                    query, query,
+                    director, director != null ? director : "",
+                    title, title != null ? title : "");
+    }
 }
