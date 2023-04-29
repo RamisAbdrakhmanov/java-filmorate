@@ -3,9 +3,11 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.dao.review.ReviewDao;
 import ru.yandex.practicum.filmorate.storage.dao.review.like.ReviewLikeDao;
+import ru.yandex.practicum.filmorate.storage.dao.user.UserDao;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +19,8 @@ public class ReviewService {
     private final ReviewDao reviewDao;
     private final ReviewLikeDao reviewLikeDao;
 
+    private final UserDao userDao;
+
     public List<Review> getReviews(int filmId, int count) {
         return reviewDao.getReviews(filmId, count).stream().map(this::addLikes).collect(Collectors.toList());
     }
@@ -26,14 +30,17 @@ public class ReviewService {
     }
 
     public Review addReview(Review review) {
+        userDao.addEvent(makeEvent("ADD", review));
         return addLikes(reviewDao.addReview(review));
     }
 
     public Review changeReview(Review review) {
+        userDao.addEvent(makeEvent("UPDATE", review));
         return addLikes(reviewDao.changeReview(review));
     }
 
     public void deleteReview(int reviewId) {
+        userDao.addEvent(makeEvent("REMOVE", getReview(reviewId)));
         reviewLikeDao.deleteAll(reviewId);
         reviewDao.deleteReview(reviewId);
     }
@@ -57,5 +64,16 @@ public class ReviewService {
     private Review addLikes(Review review) {
         review.setUseful(reviewLikeDao.getCountLikes(review.getReviewId()));
         return review;
+    }
+
+    private Event makeEvent(String operation, Review review) {
+        return Event.builder()
+                .timestamp(System.currentTimeMillis())
+                .userId(review.getUserId())
+                .eventType("REVIEW")
+                .operation(operation)
+                .eventId(0)
+                .entityId(review.getReviewId())
+                .build();
     }
 }

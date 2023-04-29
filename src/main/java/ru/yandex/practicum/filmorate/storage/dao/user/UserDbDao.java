@@ -6,16 +6,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.notfound.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.validate.FilmNameAlreadyExistException;
 import ru.yandex.practicum.filmorate.exeption.validate.UserEmailAlreadyExistException;
 import ru.yandex.practicum.filmorate.exeption.validate.UserIdNotNullException;
 import ru.yandex.practicum.filmorate.exeption.validate.UserLoginAlreadyExistException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.mapper.EventMapper;
 import ru.yandex.practicum.filmorate.storage.mapper.UserMapper;
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Objects;
 
@@ -100,6 +105,30 @@ public class UserDbDao implements UserDao {
         jdbcTemplate.update("DELETE " +
                 "FROM users " +
                 "WHERE user_id = ?", id);
+    }
+
+    @Override
+    public Event addEvent(Event event) {
+        String sql = "INSERT INTO events (timestamp, user_id, event_type, operation, entity_id) " +
+                "VALUES (?, ?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement(sql, new String[]{"event_id"});
+            ps.setLong(1, event.getTimestamp());
+            ps.setInt(2, event.getUserId());
+            ps.setString(3, event.getEventType());
+            ps.setString(4, event.getOperation());
+            ps.setInt(5, event.getEntityId());
+            return ps;
+        }, keyHolder);
+        event.setEventId(Objects.requireNonNull(keyHolder.getKey()).intValue());
+        return event;
+    }
+
+    @Override
+    public List<Event> getFeed(int userId) {
+        log.info("Запрос на вывод ленты для пользователя {} -", userId);
+        return jdbcTemplate.query("SELECT * FROM events WHERE user_id = ?", new EventMapper(), userId);
     }
 
     private void checkAdd(User user) {
@@ -206,4 +235,5 @@ public class UserDbDao implements UserDao {
 
 
     }
+
 }

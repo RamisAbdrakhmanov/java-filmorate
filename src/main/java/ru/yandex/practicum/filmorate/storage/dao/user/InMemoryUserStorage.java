@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exeption.notfound.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.validate.UserEmailAlreadyExistException;
 import ru.yandex.practicum.filmorate.exeption.validate.UserLoginAlreadyExistException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -134,5 +135,15 @@ public class InMemoryUserStorage implements UserDao {
             log.debug("User don't have name");
             user.setName(user.getLogin());
         }
+    }
+
+    @Override
+    public List<Event> getFeed(int userId) {
+        return null;
+    }
+
+    @Override
+    public Event addEvent(Event event) {
+        return null;
     }
 }
