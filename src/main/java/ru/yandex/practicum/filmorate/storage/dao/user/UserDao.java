@@ -20,5 +20,6 @@ public interface UserDao {
     void deleteUserById(int id);
 
     Event addEvent(Event event);
+
     List<Event> getFeed(int userId);
 }
