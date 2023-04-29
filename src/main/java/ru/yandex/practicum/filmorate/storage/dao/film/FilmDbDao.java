@@ -15,8 +15,7 @@ import ru.yandex.practicum.filmorate.storage.mapper.FilmMapper;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static java.lang.String.format;
 
@@ -199,37 +198,48 @@ public class FilmDbDao implements FilmDao {
 
     @Override
     public List<Film> searchFilms(String query, String by) {
-            String[] byValues = by != null ? by.split(",") : null;
-            String director = null;
-            String title = null;
-            if (byValues != null && byValues.length > 0) {
-                for (String byValue : byValues) {
-                    String[] keyValue = byValue.split("=");
-                    if (keyValue.length == 2) {
-                        String key = keyValue[0];
-                        String value = keyValue[1];
-                        if ("director".equals(key)) {
-                            director = value;
-                        } else if ("title".equals(key)) {
-                            title = value;
-                        }
-                    }
+        String[] byValues = by != null ? by.split(",") : null;
+        String directorQuery = null;
+        String titleQuery = null;
+        if (byValues != null && byValues.length > 0) {
+            for (String byValue : byValues) {
+                if (byValue.equals("director")) {
+                    directorQuery = query;
+                } else if (byValue.equals("title")) {
+                    titleQuery = query;
                 }
             }
-            return jdbcTemplate.query(
-                    "SELECT f.*, m.name AS mpa_name, COUNT(fl.film_id) AS num_likes " +
-                            "FROM films f " +
-                            "LEFT JOIN film_directors fd ON f.film_id = fd.film_id " +
-                            "LEFT JOIN directors d ON fd.director_id = d.director_id " +
-                            "LEFT JOIN mpa_ratings m ON f.mpa_rating_id = m.mpa_rating_id " +
-                            "LEFT JOIN film_likes fl ON f.film_id = fl.film_id " +
-                            "WHERE (LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%'))) " +
-                            "AND ((? IS NULL OR LOWER(d.name) LIKE LOWER(?)) OR (? IS NULL OR LOWER(f.name) LIKE LOWER(?))) " +
-                            "GROUP BY f.film_id " +
-                            "ORDER BY num_likes DESC",
-                    new FilmMapper(),
-                    query, query,
-                    director, director != null ? director : "",
-                    title, title != null ? title : "");
+        }
+
+        String sql = "SELECT f.*, m.name AS mpa_name, COUNT(fl.film_id) AS num_likes " +
+                "FROM films f " +
+                "LEFT JOIN film_directors fd ON f.film_id = fd.film_id " +
+                "LEFT JOIN directors d ON fd.director_id = d.director_id " +
+                "LEFT JOIN mpa_ratings m ON f.mpa_rating_id = m.mpa_rating_id " +
+                "LEFT JOIN film_likes fl ON f.film_id = fl.film_id ";
+        String whereClause = "";
+        List<Object> queryParams = new ArrayList<>();
+
+        if (directorQuery != null) {
+            whereClause += "(LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%')))";
+            queryParams.add(directorQuery);
+        }
+
+        if (titleQuery != null) {
+            if (!whereClause.isEmpty()) {
+                whereClause += " OR ";
+            }
+            whereClause += "(LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')))";
+            queryParams.add(titleQuery);
+        }
+
+        if (whereClause.isEmpty()) {
+            throw new IllegalArgumentException("Параметры запроса отсутствуют");
+        }
+
+        sql += "WHERE " + whereClause + " GROUP BY f.film_id ORDER BY num_likes DESC";
+        Object[] queryParamsArray = queryParams.toArray();
+
+        return jdbcTemplate.query(sql, new FilmMapper(), queryParamsArray);
     }
 }
