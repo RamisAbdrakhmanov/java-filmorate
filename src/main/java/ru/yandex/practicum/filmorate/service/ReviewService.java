@@ -42,8 +42,9 @@ public class ReviewService {
     }
 
     public Review updateReview(Review review) {
-        userDao.addEvent(makeEvent("UPDATE", review));
-        return addLikes(reviewDao.updateReview(review));
+        Review reviewUpdate = addLikes(reviewDao.updateReview(review));
+        userDao.addEvent(makeEvent("UPDATE", reviewUpdate));
+        return reviewUpdate;
     }
 
     public void deleteReview(int reviewId) {
