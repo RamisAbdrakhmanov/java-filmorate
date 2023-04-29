@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.dao.user;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -17,4 +18,8 @@ public interface UserDao {
     User changeUser(User user);
 
     void deleteUserById(int id);
+
+    Event addEvent(Event event);
+
+    List<Event> getFeed(int userId);
 }

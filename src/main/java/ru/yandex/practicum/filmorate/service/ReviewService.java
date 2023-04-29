@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.dao.film.FilmDao;
 import ru.yandex.practicum.filmorate.storage.dao.review.ReviewDao;
@@ -21,6 +22,8 @@ public class ReviewService {
     private final FilmDao filmDao;
     private final UserDao userDao;
 
+    private final UserDao userDao;
+
     public List<Review> getReviews(int filmId, int count) {
         if (filmId != 0) {
             filmDao.showFilmById(filmId);
@@ -34,14 +37,19 @@ public class ReviewService {
 
     public Review addReview(Review review) {
         checkFilmAndUserId(review);
+        userDao.addEvent(makeEvent("ADD", review));
         return addLikes(reviewDao.addReview(review));
     }
 
     public Review updateReview(Review review) {
         return addLikes(reviewDao.updateReview(review));
+    public Review changeReview(Review review) {
+        userDao.addEvent(makeEvent("UPDATE", review));
+        return addLikes(reviewDao.changeReview(review));
     }
 
     public void deleteReview(int reviewId) {
+        userDao.addEvent(makeEvent("REMOVE", getReview(reviewId)));
         reviewLikeDao.deleteAll(reviewId);
         reviewDao.deleteReview(reviewId);
     }
@@ -80,5 +88,16 @@ public class ReviewService {
     private void checkFilmAndUserId(Review review) {
         filmDao.showFilmById(review.getFilmId());
         userDao.showUserById(review.getUserId());
+    }
+
+    private Event makeEvent(String operation, Review review) {
+        return Event.builder()
+                .timestamp(System.currentTimeMillis())
+                .userId(review.getUserId())
+                .eventType("REVIEW")
+                .operation(operation)
+                .eventId(0)
+                .entityId(review.getReviewId())
+                .build();
     }
 }

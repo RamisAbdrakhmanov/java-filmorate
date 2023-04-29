@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeption.notfound.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.notfound.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.notfound.UserNotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.dao.director.DirectorDao;
@@ -44,12 +45,14 @@ public class FilmService {
         filmDao.showFilmById(filmId);
         userDao.showUserById(userId);
         likeDao.addLike(filmId, userId);
+        userDao.addEvent(makeEvent("ADD", filmId, userId));
     }
 
     public void deleteLike(int filmId, int userId) {
         filmDao.showFilmById(filmId);
         userDao.showUserById(userId);
         likeDao.deleteLike(filmId, userId);
+        userDao.addEvent(makeEvent("REMOVE", filmId, userId));
     }
 
     public List<Film> showPopularFilms(int count, Integer genreId, Integer year) {
@@ -128,5 +131,16 @@ public class FilmService {
 
     public List<Film> getCommonFilms(int userId, int friendId) throws UserNotFoundException, MpaNotFoundException {
         return filmDao.getCommonFilms(userId, friendId);
+    }
+
+    private Event makeEvent(String operation, int filmId, int userId) {
+        return Event.builder()
+                .timestamp(System.currentTimeMillis())
+                .userId(userId)
+                .eventType("LIKE")
+                .operation(operation)
+                .eventId(0)
+                .entityId(filmId)
+                .build();
     }
 }

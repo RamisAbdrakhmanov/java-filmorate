@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dao.film.FilmDao;
@@ -36,12 +37,14 @@ public class UserService {
         checkUser(userID);
         checkUser(friendID);
         friendDao.addFriend(userID, friendID);
+        userDao.addEvent(makeEvent("ADD", userID, friendID));
     }
 
     public void deleteFriend(int userID, int friendID) {
         checkUser(userID);
         checkUser(friendID);
         friendDao.deleteFriend(userID, friendID);
+        userDao.addEvent(makeEvent("REMOVE", userID, friendID));
     }
 
     public List<User> showCommonFriends(int userID, int friendID) {
@@ -75,6 +78,11 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public List<Event> getFeed(int userId) {
+        checkUser(userId);
+        return userDao.getFeed(userId);
+    }
+
     public List<User> showUsers() {
         return userDao.showUsers();
     }
@@ -97,5 +105,16 @@ public class UserService {
 
     private void checkUser(int userId) {
         showUserById(userId);
+    }
+
+    private Event makeEvent(String operation, int userId, int friendId) {
+        return Event.builder()
+                .timestamp(System.currentTimeMillis())
+                .userId(userId)
+                .eventType("FRIEND")
+                .operation(operation)
+                .eventId(0)
+                .entityId(friendId)
+                .build();
     }
 }
