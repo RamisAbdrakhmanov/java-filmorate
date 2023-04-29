@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.notfound.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.validate.DateReleaseException;
 import ru.yandex.practicum.filmorate.exeption.validate.FilmIdNotNullException;
+import ru.yandex.practicum.filmorate.exeption.validate.FilmNameAlreadyExistException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmMapper;
 
@@ -226,7 +227,6 @@ public class FilmDbDao implements FilmDao {
     @Override
     public List<Film> getBatchFilmsByIds(List<Integer> filmIds) {
         List<String> stringIds = filmIds.stream().map(Object::toString).collect(Collectors.toList());
-
         String sql = "SELECT f.*, m.name AS mpa_name, COUNT(fl.film_id) AS num_likes " +
                 "FROM films f " +
                 "LEFT JOIN mpa_ratings m ON f.mpa_rating_id = m.mpa_rating_id " +

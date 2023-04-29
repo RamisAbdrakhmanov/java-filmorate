@@ -117,4 +117,9 @@ public class InMemoryFilmStorage implements FilmDao {
     public List<Film> searchFilms(String query, String by) {
         return null;
     }
+
+    @Override
+    public List<Film> getBatchFilmsByIds(List<Integer> filmIds) {
+        return null;
+    }
 }

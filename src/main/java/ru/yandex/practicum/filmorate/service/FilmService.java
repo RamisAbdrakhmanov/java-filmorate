@@ -82,8 +82,6 @@ public class FilmService {
         return filmDao.searchFilms(query, by).stream()
                 .peek(this::collectorFilm)
                 .collect(Collectors.toList());
-
-        return filteredFilms.stream().limit(count).peek(this::collectorFilm).collect(Collectors.toList());
     }
 
     public Film showFilmById(int id) {
