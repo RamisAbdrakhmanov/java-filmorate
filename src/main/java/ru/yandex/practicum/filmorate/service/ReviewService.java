@@ -22,7 +22,6 @@ public class ReviewService {
     private final FilmDao filmDao;
     private final UserDao userDao;
 
-    private final UserDao userDao;
 
     public List<Review> getReviews(int filmId, int count) {
         if (filmId != 0) {
@@ -37,15 +36,14 @@ public class ReviewService {
 
     public Review addReview(Review review) {
         checkFilmAndUserId(review);
-        userDao.addEvent(makeEvent("ADD", review));
-        return addLikes(reviewDao.addReview(review));
+        Review reviewAdd = addLikes(reviewDao.addReview(review));
+        userDao.addEvent(makeEvent("ADD", reviewAdd));
+        return reviewAdd;
     }
 
     public Review updateReview(Review review) {
-        return addLikes(reviewDao.updateReview(review));
-    public Review changeReview(Review review) {
         userDao.addEvent(makeEvent("UPDATE", review));
-        return addLikes(reviewDao.changeReview(review));
+        return addLikes(reviewDao.updateReview(review));
     }
 
     public void deleteReview(int reviewId) {
