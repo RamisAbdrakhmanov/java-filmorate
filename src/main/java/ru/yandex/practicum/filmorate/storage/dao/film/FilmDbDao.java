@@ -10,15 +10,14 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.notfound.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.validate.DateReleaseException;
 import ru.yandex.practicum.filmorate.exeption.validate.FilmIdNotNullException;
-import ru.yandex.practicum.filmorate.exeption.validate.FilmNameAlreadyExistException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmMapper;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -132,28 +131,6 @@ public class FilmDbDao implements FilmDao {
         if (film.getReleaseDate().isBefore(localDate)) {
             log.error("Ошибка добавление даты {}, дата должна быть после {}.", film.getReleaseDate(), localDate);
             throw new DateReleaseException("Date is wrong.");
-        }
-
-        try {
-            Film nameFilm = (jdbcTemplate.queryForObject(format(
-                    "SELECT film_id, f.name as name, description, release_date, " +
-                            "           duration_in_minutes, f.mpa_rating_id as mpa_rating_id, fm.name as mpa_name " +
-                            "FROM films as f " +
-                            "LEFT OUTER JOIN mpa_ratings as fm " +
-                            "ON f.mpa_rating_id = fm.mpa_rating_id  " +
-                            "WHERE f.name= '%s' ", film.getName()), new FilmMapper()));
-
-            log.error("Фильм в именем - {} уже имеет ID - {}",
-                    Objects.requireNonNull(nameFilm).getName(),
-                    nameFilm.getId());
-            throw new FilmNameAlreadyExistException(
-                    String.format("Фильм в именем - %s уже имеет ID - %s",
-                            nameFilm.getName(),
-                            nameFilm.getId()));
-
-        } catch (EmptyResultDataAccessException e) { // эта ошибка обрабатывает NULL на выходе из базы,
-            // иначе не нашел как мне получить или null или значение.
-            log.info("Фильм с именем {} отсутствует!", film.getName());
         }
     }
 
