@@ -6,10 +6,6 @@ import org.apache.tomcat.util.buf.StringUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.notfound.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.validate.DateReleaseException;
@@ -238,7 +234,6 @@ public class FilmDbDao implements FilmDao {
             whereClause += "(LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')))";
             queryParams.add(titleQuery);
         }
-
         if (whereClause.isEmpty()) {
             throw new IllegalArgumentException("Параметры запроса отсутствуют");
         }

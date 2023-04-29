@@ -72,7 +72,6 @@ public class FilmService {
                 filteredFilms.removeIf(f -> !f.getGenres().contains(genre));
             }
         }
-
         return filteredFilms.stream().peek(this::collectorFilm).limit(count).collect(Collectors.toList());
     }
 
