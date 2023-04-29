@@ -52,12 +52,8 @@ public class FilmService {
     public List<Film> showPopularFilms(int count, Integer genreId, Integer year) {
         List<Integer> filmIds = likeDao.showLikesSort(count);
         Set<Film> films = new LinkedHashSet<>();
-        for (Integer filmId : filmIds) {
-            Film film = filmDao.showFilmById(filmId);
-            if (film != null) {
-                films.add(film);
-            }
-        }
+        films.addAll(filmDao.getBatchFilmsByIds(filmIds));
+
         if (films.isEmpty()) {
             films.addAll(showFilms());
         }

@@ -2,9 +2,14 @@ package ru.yandex.practicum.filmorate.storage.dao.film;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.notfound.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.validate.DateReleaseException;
@@ -16,6 +21,7 @@ import ru.yandex.practicum.filmorate.storage.mapper.FilmMapper;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -241,5 +247,20 @@ public class FilmDbDao implements FilmDao {
         Object[] queryParamsArray = queryParams.toArray();
 
         return jdbcTemplate.query(sql, new FilmMapper(), queryParamsArray);
+    }
+
+    @Override
+    public List<Film> getBatchFilmsByIds(List<Integer> filmIds) {
+        List<String> stringIds = filmIds.stream().map(Object::toString).collect(Collectors.toList());
+
+        String sql = "SELECT f.*, m.name AS mpa_name, COUNT(fl.film_id) AS num_likes " +
+                "FROM films f " +
+                "LEFT JOIN mpa_ratings m ON f.mpa_rating_id = m.mpa_rating_id " +
+                "LEFT JOIN film_likes fl ON f.film_id = fl.film_id " +
+                "WHERE f.film_id IN (" + StringUtils.join(stringIds, ',') + ")" +
+                "GROUP BY f.film_id " +
+                "ORDER BY num_likes DESC";
+
+        return jdbcTemplate.query(sql, new FilmMapper());
     }
 }
