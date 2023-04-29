@@ -13,7 +13,7 @@ public interface ReviewDao {
 
     Review addReview(Review review);
 
-    Review changeReview(Review review);
+    Review updateReview(Review review);
 
     void deleteReview(int reviewId);
 

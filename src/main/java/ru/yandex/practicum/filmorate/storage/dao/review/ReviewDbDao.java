@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.mapper.ReviewMapper;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -80,9 +79,9 @@ public class ReviewDbDao implements ReviewDao {
     }
 
     @Override
-    public Review changeReview(Review review) {
+    public Review updateReview(Review review) {
         log.info("запрос на изменение review - {}", review);
-        checkChange(review);
+        getReview(review.getReviewId());
         jdbcTemplate.update("" +
                         "UPDATE reviews " +
                         "SET content=?, is_positive=? " +
@@ -127,22 +126,6 @@ public class ReviewDbDao implements ReviewDao {
 
         if (check != 0) {
             throw new ReviewValidateException("Ошибка валидация: пользователь уже оставлял отзыв к этому фильму.");
-        }
-    }
-
-    /**
-     * Проверка на добавления отзыва:
-     * 1. Один пользователь может оставить только один отзыв к фильму.
-     * 2. Отзыв существовал прежде
-     * 3. User и Film отзыва, не могут быть изменены;
-     */
-    private void checkChange(Review review) {
-        log.info("проверка на добавление review - {}", review);
-        Review changeReview = getReview(review.getReviewId());
-
-        if (!Objects.equals(changeReview.getUserId(), review.getUserId()) ||
-                !Objects.equals(changeReview.getFilmId(), review.getFilmId())) {
-            throw new ReviewValidateException("User и Film отзыва, не могут быть изменены");
         }
     }
 }
