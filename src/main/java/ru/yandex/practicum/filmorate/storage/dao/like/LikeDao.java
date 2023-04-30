@@ -7,7 +7,7 @@ import java.util.List;
 @Component
 public interface LikeDao {
 
-    void addLike(int filmID, int userID);
+    void addLike(int filmID, int userID, Integer rating);
 
     void deleteLike(int filmID, int userID);
 
