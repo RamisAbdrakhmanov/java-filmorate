@@ -23,14 +23,14 @@ public class ReviewService {
     private final UserDao userDao;
 
 
-    public List<Review> getReviews(int filmId, int count) {
+    public List<Review> getReviews(Integer filmId, Integer count) {
         if (filmId != 0) {
-            filmDao.showFilmById(filmId);
+            filmDao.getFilmById(filmId);
         }
         return reviewDao.getReviews(filmId, count).stream().map(this::addLikes).sorted().collect(Collectors.toList());
     }
 
-    public Review getReview(int reviewId) {
+    public Review getReview(Integer reviewId) {
         return addLikes(reviewDao.getReview(reviewId));
     }
 
@@ -47,28 +47,28 @@ public class ReviewService {
         return reviewUpdate;
     }
 
-    public void deleteReview(int reviewId) {
+    public void deleteReview(Integer reviewId) {
         userDao.addEvent(makeEvent("REMOVE", getReview(reviewId)));
         reviewLikeDao.deleteAll(reviewId);
         reviewDao.deleteReview(reviewId);
     }
 
-    public void addLike(int reviewId, int userId) {
+    public void addLike(Integer reviewId, Integer userId) {
         checkReviewAndUserId(reviewId, userId);
         reviewLikeDao.addLike(reviewId, userId);
     }
 
-    public void addDislike(int reviewId, int userId) {
+    public void addDislike(Integer reviewId, Integer userId) {
         checkReviewAndUserId(reviewId, userId);
         reviewLikeDao.addDislike(reviewId, userId);
     }
 
-    public void deleteLike(int reviewId, int userId) {
+    public void deleteLike(Integer reviewId, Integer userId) {
         checkReviewAndUserId(reviewId, userId);
         reviewLikeDao.deleteLike(reviewId, userId);
     }
 
-    public void deleteDislike(int reviewId, int userId) {
+    public void deleteDislike(Integer reviewId, Integer userId) {
         checkReviewAndUserId(reviewId, userId);
         reviewLikeDao.deleteDislike(reviewId, userId);
     }
@@ -79,14 +79,14 @@ public class ReviewService {
         return review;
     }
 
-    private void checkReviewAndUserId(int reviewId, int userId) {
+    private void checkReviewAndUserId(Integer reviewId, Integer userId) {
         reviewDao.getReview(reviewId);
-        userDao.showUserById(userId);
+        userDao.getUserById(userId);
     }
 
     private void checkFilmAndUserId(Review review) {
-        filmDao.showFilmById(review.getFilmId());
-        userDao.showUserById(review.getUserId());
+        filmDao.getFilmById(review.getFilmId());
+        userDao.getUserById(review.getUserId());
     }
 
     private Event makeEvent(String operation, Review review) {

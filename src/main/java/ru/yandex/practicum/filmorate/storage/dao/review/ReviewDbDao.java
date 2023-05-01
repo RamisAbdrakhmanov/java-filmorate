@@ -24,14 +24,16 @@ public class ReviewDbDao implements ReviewDao {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<Review> getReviews(int filmId, int count) {
+    public List<Review> getReviews(Integer filmId, Integer count) {
         List<Review> reviews;
         if (filmId != 0) {
+            log.info("Запрос на получение списка отзывов на фильм с id = {} длиной = {}", filmId, count);
             reviews = jdbcTemplate.query(format("" +
                     "SELECT review_id, user_id, film_id, content, is_positive " +
                     "FROM reviews " +
                     "WHERE film_id=%d", filmId), new ReviewMapper());
         } else {
+            log.info("Запрос на получение списка отзывов длиной = {}", count);
             reviews = jdbcTemplate.query("" +
                     "SELECT review_id, user_id, film_id, content, is_positive " +
                     "FROM reviews ", new ReviewMapper());
@@ -40,8 +42,8 @@ public class ReviewDbDao implements ReviewDao {
     }
 
     @Override
-    public Review getReview(int reviewId) {
-        log.info("Показать review по id - {}", reviewId);
+    public Review getReview(Integer reviewId) {
+        log.info("Запрос на получение отзыва с id - {}", reviewId);
         try {
             Review review = jdbcTemplate.queryForObject(format("" +
                     "SELECT review_id, user_id, film_id, content, is_positive " +
@@ -50,14 +52,15 @@ public class ReviewDbDao implements ReviewDao {
 
             return review;
         } catch (EmptyResultDataAccessException e) {
-            log.warn("Не возможно найти review с id - {}.", reviewId);
-            throw new ReviewNotFoundException(String.format("Не возможно найти review с id - %d.", reviewId));
+            String message = String.format("Невозможно найти отзыв с id = %d", reviewId);
+            log.warn(message);
+            throw new ReviewNotFoundException(message);
         }
     }
 
     @Override
     public Review addReview(Review review) {
-        log.info("запрос на добавление review - {}", review);
+        log.info("Запрос на добавление отзыва с id = {}", review);
         checkAdd(review);
 
         jdbcTemplate.update("" +
@@ -68,7 +71,6 @@ public class ReviewDbDao implements ReviewDao {
                 review.getContent(),
                 review.getIsPositive()
         );
-
 
         Review getReview = jdbcTemplate.queryForObject(format("" +
                 "SELECT review_id, user_id, film_id, content, is_positive " +
@@ -94,8 +96,8 @@ public class ReviewDbDao implements ReviewDao {
     }
 
     @Override
-    public void deleteReview(int reviewId) {
-        log.info("Удаление review");
+    public void deleteReview(Integer reviewId) {
+        log.info("Запрос на удаление отзыва с id = {}", reviewId);
         jdbcTemplate.update("" +
                         "DELETE " +
                         "FROM reviews " +
@@ -109,11 +111,12 @@ public class ReviewDbDao implements ReviewDao {
      * 2. Пользователь должен существовать (проверить надо)
      */
     private void checkAdd(Review review) {
-        log.info("проверка на добавление review - {}", review);
+        log.info("Проверка на добавление review = {}", review);
 
         if (review.getReviewId() != null) {
-            log.error("user_id не должно иметь значение");
-            throw new UserIdNotNullException("user_id не должно иметь значение");
+            String message = "user_id не должно иметь значение";
+            log.error(message);
+            throw new UserIdNotNullException(message);
         }
         Integer check = jdbcTemplate.queryForObject(format("" +
                                 "SELECT count(*) " +

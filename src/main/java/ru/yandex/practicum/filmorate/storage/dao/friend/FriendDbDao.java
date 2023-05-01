@@ -20,7 +20,7 @@ public class FriendDbDao implements FriendDao {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void addFriend(int userId, int friendId) {
+    public void addFriend(Integer userId, Integer friendId) {
         log.info("запрос на добавления в друзья от user_id={} к friend_id={}", userId, friendId);
         if (userId == friendId) {
             log.info("нельзя добавить самого себя в друзья");
@@ -52,7 +52,7 @@ public class FriendDbDao implements FriendDao {
     }
 
     @Override
-    public void deleteFriend(int userId, int friendId) {
+    public void deleteFriend(Integer userId, Integer friendId) {
         log.info("запрос на удаление из друзей от user_id={} к friend_id={}", userId, friendId);
         switch (checkFriend(userId, friendId)) {
             case 1:
@@ -84,7 +84,7 @@ public class FriendDbDao implements FriendDao {
     }
 
     @Override
-    public List<Integer> showFriendsById(int userId) {
+    public List<Integer> getFriendsById(Integer userId) {
         log.info("запрос на вывод друзей пользователя ID - {}", userId);
 
         List<Integer> users = jdbcTemplate.queryForList(format(""
@@ -102,7 +102,7 @@ public class FriendDbDao implements FriendDao {
         return users;
     }
 
-    private byte checkFriend(int userId, int friendId) {
+    private byte checkFriend(Integer userId, Integer friendId) {
         log.info("проверка записи друзей");
         try {
 

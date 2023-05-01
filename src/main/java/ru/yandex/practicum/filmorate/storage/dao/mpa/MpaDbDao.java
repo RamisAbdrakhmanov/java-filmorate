@@ -20,8 +20,8 @@ public class MpaDbDao implements MpaDao {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Mpa showById(int id) {
-        log.info("запрос на показ рейтинга по ID");
+    public Mpa getById(Integer id) {
+        log.info("Запрос на получение рейтинга с id = {}", id);
         try {
             Mpa mpa = jdbcTemplate.queryForObject(format(""
                     + "SELECT mpa_rating_id, name "
@@ -29,16 +29,15 @@ public class MpaDbDao implements MpaDao {
                     + "WHERE mpa_rating_id=%s", id), new MpaMapper());
             return mpa;
         } catch (EmptyResultDataAccessException e) {
-            log.error("Не возможно найти user с id - {}.", id);
-            throw new MpaNotFoundException(format("Не возможно найти user с id - %s.", id));
+            log.error("Не возможно найти пользователя с id - {}.", id);
+            throw new MpaNotFoundException(format("Не возможно найти пользователя с id - %s.", id));
         }
     }
 
 
     @Override
     public List<Mpa> getAll() {
-        log.info("запрос на показ всех рейтингов");
-
+        log.info("Запрос на получение списка всех пользователей");
         List<Mpa> result = jdbcTemplate.query(""
                 + "SELECT mpa_rating_id, name "
                 + "FROM mpa_ratings "

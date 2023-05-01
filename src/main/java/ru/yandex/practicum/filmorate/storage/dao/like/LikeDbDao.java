@@ -18,9 +18,9 @@ public class LikeDbDao implements LikeDao {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void addLike(int filmID, int userID) {
+    public void addLike(Integer filmID, Integer userID) {
         try {
-            log.info("запрос на добавление like фильму с id - {} от user c id - {}", filmID, userID);
+            log.info("Запрос на добавление like фильму с id - {} от user c id - {}", filmID, userID);
             jdbcTemplate.update(""
                     + "INSERT INTO film_likes (film_id, user_id) "
                     + "VALUES (?, ?)", filmID, userID);
@@ -31,8 +31,8 @@ public class LikeDbDao implements LikeDao {
     }
 
     @Override
-    public void deleteLike(int filmID, int userID) {
-        log.info("запрос на лайка like у фильма с id - {} от user c id - {}", filmID, userID);
+    public void deleteLike(Integer filmID, Integer userID) {
+        log.info("Запрос на лайка like у фильма с id - {} от user c id - {}", filmID, userID);
         try {
             jdbcTemplate.update(""
                     + "DELETE FROM film_likes "
@@ -45,8 +45,8 @@ public class LikeDbDao implements LikeDao {
     }
 
     @Override
-    public List<Integer> showLikesSort(int count) {
-        log.info("запрос на вывод самых популярных фильмов в количестве - {}", count);
+    public List<Integer> getLikesSort(Integer count) {
+        log.info("Запрос на вывод самых популярных фильмов в количестве - {}", count);
         List<Integer> filmId = jdbcTemplate.queryForList(format(""
                 + "SELECT film_id "
                 + "FROM film_likes "
@@ -57,8 +57,8 @@ public class LikeDbDao implements LikeDao {
     }
 
     @Override
-    public List<Integer> getRecommendedList(int userID) {
-        log.info("Запрос на вывод списка фильмов для перескающихся по лайкам с пользователем {}", userID);
+    public List<Integer> getRecommendedList(Integer userID) {
+        log.info("Запрос на вывод списка рекомендованных фильмов для пользователя с id = {}", userID);
         return jdbcTemplate.queryForList(format("SELECT fl2.FILM_ID " +
                 "FROM film_likes fl2 " +
                 "WHERE fl2.user_id = " +
