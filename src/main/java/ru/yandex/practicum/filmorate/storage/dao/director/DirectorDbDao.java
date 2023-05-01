@@ -41,8 +41,8 @@ public class DirectorDbDao implements DirectorDao {
                 append(" режиссеров с id = ");
         List<Object[]> batch = new ArrayList<>();
         for (Director director : directors) {
-            Object[] values = new Object[] {
-                    filmId, director.getId() };
+            Object[] values = new Object[]{
+                    filmId, director.getId()};
             sb.append(director.getId()).append(", ");
             batch.add(values);
         }
