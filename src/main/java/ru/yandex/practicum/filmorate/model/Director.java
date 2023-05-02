@@ -8,13 +8,14 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Director {
-    private int id;
+    private Integer id;
     @NotNull(message = "Director name cannot be not null")
     @NotEmpty(message = "Director name cannot be not empty")
     @NotBlank(message = "Director name cannot be not blank")
@@ -25,7 +26,7 @@ public class Director {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Director director = (Director) o;
-        return id == director.id;
+        return Objects.equals(id, director.id);
     }
 
     @Override

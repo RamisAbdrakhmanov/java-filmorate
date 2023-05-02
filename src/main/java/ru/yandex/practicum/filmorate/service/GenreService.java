@@ -14,11 +14,11 @@ import java.util.List;
 public class GenreService {
     private final GenreDao genreDao;
 
-    public Genre get(int id) {
-        return genreDao.showGenreById(id);
+    public Genre get(Integer id) {
+        return genreDao.getGenreById(id);
     }
 
     public List<Genre> getAll() {
-        return genreDao.showGenres();
+        return genreDao.getGenres();
     }
 }

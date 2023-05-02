@@ -15,8 +15,8 @@ import java.util.List;
 public class MpaService {
     private final MpaDao mpaDao;
 
-    public Mpa showById(int id) {
-        return mpaDao.showById(id);
+    public Mpa getById(Integer id) {
+        return mpaDao.getById(id);
     }
 
     public List<Mpa> getAll() {

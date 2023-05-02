@@ -9,17 +9,17 @@ import java.util.List;
 @Component
 public interface UserDao {
 
-    List<User> showUsers();
+    List<User> getUsers();
 
-    User showUserById(int id);
+    User getUserById(Integer id);
 
     User addUser(User user);
 
-    User changeUser(User user);
+    User updateUser(User user);
 
-    void deleteUserById(int id);
+    void deleteUserById(Integer id);
 
     Event addEvent(Event event);
 
-    List<Event> getFeed(int userId);
+    List<Event> getFeed(Integer userId);
 }

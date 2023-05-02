@@ -64,7 +64,7 @@ public class FilmDbDao implements FilmDao {
     }
 
     @Override
-    public Film changeFilm(Film film) {
+    public Film updateFilm(Film film) {
         checkChange(film);
         jdbcTemplate.update("UPDATE films " +
                         "SET name=?,description=?, release_date=?, duration_in_minutes=?, mpa_rating_id=? " +
@@ -75,18 +75,18 @@ public class FilmDbDao implements FilmDao {
                 film.getDuration(),
                 film.getMpa().getId(),
                 film.getId());
-        return showFilmById(film.getId());
+        return getFilmById(film.getId());
     }
 
     @Override
-    public void deleteFilmById(int id) {
+    public void deleteFilmById(Integer id) {
         jdbcTemplate.update("DELETE " +
                 "FROM films " +
                 "WHERE film_id = ?", id);
     }
 
     @Override
-    public Film showFilmById(int id) {
+    public Film getFilmById(Integer id) {
         try {
             Film film = jdbcTemplate.queryForObject(format(
                     "SELECT film_id, f.name as name, " +
@@ -107,7 +107,7 @@ public class FilmDbDao implements FilmDao {
     }
 
     @Override
-    public List<Film> showFilms() {
+    public List<Film> getFilms() {
         List<Film> films = jdbcTemplate.query(
                 "SELECT film_id, f.name as name, description, release_date, " +
                         "duration_in_minutes,  f.mpa_rating_id as mpa_rating_id, fm.name as mpa_name " +
@@ -117,7 +117,7 @@ public class FilmDbDao implements FilmDao {
     }
 
     @Override
-    public List<Integer> showUsersLikedFilms(int id) {
+    public List<Integer> getUsersLikedFilms(Integer id) {
         return jdbcTemplate.queryForList(format("SELECT film_id FROM film_likes WHERE user_id = %d", id), Integer.class);
     }
 
@@ -135,7 +135,7 @@ public class FilmDbDao implements FilmDao {
     }
 
     private void checkChange(Film film) {
-        showFilmById(film.getId());
+        getFilmById(film.getId());
 
         LocalDate localDate = LocalDate.of(1895, 12, 28);
         if (film.getReleaseDate().isBefore(localDate)) {
@@ -145,7 +145,7 @@ public class FilmDbDao implements FilmDao {
     }
 
     @Override
-    public List<Film> getCommonFilms(int userId, int friendId) {
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
         String sql = "SELECT f.*, M.* " +
                 "FROM FILM_LIKES " +
                 "JOIN FILM_LIKES fl ON fl.FILM_ID = FILM_LIKES.FILM_ID " +

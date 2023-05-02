@@ -7,15 +7,15 @@ import java.util.List;
 
 @Component
 public interface ReviewDao {
-    List<Review> getReviews(int filmId, int count);
+    List<Review> getReviews(Integer filmId, Integer count);
 
-    Review getReview(int reviewId);
+    Review getReview(Integer reviewId);
 
     Review addReview(Review review);
 
     Review updateReview(Review review);
 
-    void deleteReview(int reviewId);
+    void deleteReview(Integer reviewId);
 
 
 }

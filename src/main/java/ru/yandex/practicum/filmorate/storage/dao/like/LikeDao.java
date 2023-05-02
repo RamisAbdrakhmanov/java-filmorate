@@ -7,11 +7,11 @@ import java.util.List;
 @Component
 public interface LikeDao {
 
-    void addLike(int filmID, int userID);
+    void addLike(Integer filmID, Integer userID);
 
-    void deleteLike(int filmID, int userID);
+    void deleteLike(Integer filmID, Integer userID);
 
-    List<Integer> showLikesSort(int count);
+    List<Integer> getLikesSort(Integer count);
 
-    List<Integer> getRecommendedList(int userID);
+    List<Integer> getRecommendedList(Integer userID);
 }

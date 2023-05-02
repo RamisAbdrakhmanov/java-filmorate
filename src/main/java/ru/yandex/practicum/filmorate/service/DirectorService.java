@@ -16,11 +16,11 @@ public class DirectorService {
         return directorDao.addDirector(director);
     }
 
-    public Director changeDirector(Director director) {
-        return directorDao.changeDirector(director);
+    public Director updateDirector(Director director) {
+        return directorDao.updateDirector(director);
     }
 
-    public Director getDirector(int id) {
+    public Director getDirector(Integer id) {
         return directorDao.getDirector(id);
     }
 
@@ -28,7 +28,7 @@ public class DirectorService {
         return directorDao.getDirectors();
     }
 
-    public void deleteDirector(int id) {
+    public void deleteDirector(Integer id) {
         directorDao.deleteDirector(id);
     }
 }

@@ -36,8 +36,7 @@ public class UserDbDao implements UserDao {
 
 
     @Override
-    public List<User> showUsers() {
-        log.info("запрос на вывод всех пользователей");
+    public List<User> getUsers() {
         List<User> users = jdbcTemplate.query(""
                 + "SELECT user_id, email, login, name, birthday "
                 + "FROM users", new UserMapper());
@@ -45,8 +44,7 @@ public class UserDbDao implements UserDao {
     }
 
     @Override
-    public User showUserById(int id) {
-        log.info("запрос на вывод пользователя по id - {}", id);
+    public User getUserById(Integer id) {
         try {
             User user = jdbcTemplate.queryForObject(format(""
                     + "SELECT user_id, email, login, name, birthday "
@@ -55,14 +53,14 @@ public class UserDbDao implements UserDao {
 
             return user;
         } catch (EmptyResultDataAccessException e) {
-            log.warn("Не возможно найти user с id - {}.", id);
-            throw new UserNotFoundException(String.format("Не возможно найти user с id - %s.", id));
+            String message = String.format("Не возможно найти пользователя с id = %d", id);
+            log.warn(message);
+            throw new UserNotFoundException(message);
         }
     }
 
     @Override
     public User addUser(User user) {
-        log.info("запрос на добавление пользователя - {}", user);
         checkAdd(user);
 
         jdbcTemplate.update(""
@@ -81,8 +79,7 @@ public class UserDbDao implements UserDao {
     }
 
     @Override
-    public User changeUser(User user) {
-        log.info("запрос на изменение пользователя - {}", user);
+    public User updateUser(User user) {
         checkChange(user);
         jdbcTemplate.update(""
                         + "UPDATE users "
@@ -93,15 +90,13 @@ public class UserDbDao implements UserDao {
                 user.getName(),
                 Date.valueOf(user.getBirthday()),
                 user.getId());
-        User result = showUserById(user.getId());
+        User result = getUserById(user.getId());
         return result;
     }
 
 
     @Override
-    public void deleteUserById(int id) {
-        log.info("запрос на вывод удаление по id - {}", id);
-
+    public void deleteUserById(Integer id) {
         jdbcTemplate.update("DELETE " +
                 "FROM users " +
                 "WHERE user_id = ?", id);
@@ -126,8 +121,7 @@ public class UserDbDao implements UserDao {
     }
 
     @Override
-    public List<Event> getFeed(int userId) {
-        log.info("Запрос на вывод ленты для пользователя {} -", userId);
+    public List<Event> getFeed(Integer userId) {
         return jdbcTemplate.query("SELECT * FROM events WHERE user_id = ?", new EventMapper(), userId);
     }
 
@@ -186,7 +180,7 @@ public class UserDbDao implements UserDao {
 
     private void checkChange(User user) {
         log.info("проверка на изменение user - {}", user);
-        showUserById(user.getId());
+        getUserById(user.getId());
         try {
             User loginUser = jdbcTemplate.queryForObject(format(""
                     + "SELECT user_id, email, login, name, birthday "

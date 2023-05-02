@@ -23,13 +23,13 @@ public class ReviewController {
     }
 
     @GetMapping
-    public List<Review> getReviews(@RequestParam(defaultValue = "0", required = false) int filmId,
-                                   @RequestParam(defaultValue = "10", required = false) int count) {
+    public List<Review> getReviews(@RequestParam(defaultValue = "0", required = false) Integer filmId,
+                                   @RequestParam(defaultValue = "10", required = false) Integer count) {
         return reviewService.getReviews(filmId, count);
     }
 
     @GetMapping("/{reviewId}")
-    public Review getReview(@PathVariable int reviewId) {
+    public Review getReview(@PathVariable Integer reviewId) {
         return reviewService.getReview(reviewId);
     }
 
@@ -44,27 +44,27 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{reviewId}")
-    public void deleteReview(@PathVariable int reviewId) {
+    public void deleteReview(@PathVariable Integer reviewId) {
         reviewService.deleteReview(reviewId);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public void addLike(@PathVariable(name = "id") int reviewId, @PathVariable int userId) {
+    public void addLike(@PathVariable(name = "id") Integer reviewId, @PathVariable Integer userId) {
         reviewService.addLike(reviewId, userId);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
-    public void addDislike(@PathVariable(name = "id") int reviewId, @PathVariable int userId) {
+    public void addDislike(@PathVariable(name = "id") Integer reviewId, @PathVariable Integer userId) {
         reviewService.addDislike(reviewId, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public void deleteLike(@PathVariable(name = "id") int reviewId, @PathVariable int userId) {
+    public void deleteLike(@PathVariable(name = "id") Integer reviewId, @PathVariable Integer userId) {
         reviewService.deleteLike(reviewId, userId);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
-    public void deleteDislike(@PathVariable(name = "id") int reviewId, @PathVariable int userId) {
+    public void deleteDislike(@PathVariable(name = "id") Integer reviewId, @PathVariable Integer userId) {
         reviewService.deleteDislike(reviewId, userId);
     }
 }
