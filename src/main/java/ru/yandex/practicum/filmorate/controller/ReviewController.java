@@ -23,8 +23,8 @@ public class ReviewController {
     }
 
     @GetMapping
-    public List<Review> getReviews(@RequestParam(defaultValue = "0", required = false) Integer filmId,
-                                   @RequestParam(defaultValue = "10", required = false) Integer count) {
+    public List<Review> getReviews(@RequestParam(defaultValue = "0") Integer filmId,
+                                   @RequestParam(defaultValue = "10") Integer count) {
         return reviewService.getReviews(filmId, count);
     }
 

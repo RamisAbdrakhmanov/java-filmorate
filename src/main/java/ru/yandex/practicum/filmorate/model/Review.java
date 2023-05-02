@@ -15,17 +15,17 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class Review implements Comparable<Review> {
 
-    Integer reviewId;
-    @NotNull(message = "Film name cannot be not null")
+    private Integer reviewId;
+
     @NotEmpty(message = "Film name cannot be not empty")
     @NotBlank(message = "Film name cannot be not blank")
-    String content;
-    Boolean isPositive;
+    private String content;
+    private Boolean isPositive;
     @NotNull
-    Integer userId;
+    private Integer userId;
     @NotNull
-    Integer filmId;
-    Integer useful;
+    private Integer filmId;
+    private Integer useful;
 
     @Override
     public int compareTo(Review o) {

@@ -36,9 +36,9 @@ public class DirectorDbDao implements DirectorDao {
 
     @Override
     public void addFilmDirectors(Integer filmId, Set<Director> directors) {
-        StringBuilder sb = new StringBuilder("Запрос на добавление в фильм с id = ").
-                append(filmId).
-                append(" режиссеров с id = ");
+        StringBuilder sb = new StringBuilder("Запрос на добавление в фильм с id = ")
+                .append(filmId)
+                .append(" режиссеров с id = ");
         List<Object[]> batch = new ArrayList<>();
         for (Director director : directors) {
             Object[] values = new Object[]{

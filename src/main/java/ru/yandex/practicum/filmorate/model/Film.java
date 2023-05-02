@@ -18,7 +18,7 @@ import java.util.Set;
 @Builder
 public class Film {
     private Integer id;
-    @NotNull(message = "Film name cannot be not null")
+
     @NotEmpty(message = "Film name cannot be not empty")
     @NotBlank(message = "Film name cannot be not blank")
     private String name;

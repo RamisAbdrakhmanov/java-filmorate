@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Data
@@ -16,8 +14,7 @@ import java.util.Objects;
 @Builder
 public class Director {
     private Integer id;
-    @NotNull(message = "Director name cannot be not null")
-    @NotEmpty(message = "Director name cannot be not empty")
+
     @NotBlank(message = "Director name cannot be not blank")
     private String name;
 
