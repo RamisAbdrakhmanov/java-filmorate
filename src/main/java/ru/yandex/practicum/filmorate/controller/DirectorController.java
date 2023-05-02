@@ -9,10 +9,10 @@ import ru.yandex.practicum.filmorate.service.DirectorService;
 import javax.validation.Valid;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/directors")
 @RequiredArgsConstructor
-@Slf4j
 public class DirectorController {
     private final DirectorService directorService;
 
