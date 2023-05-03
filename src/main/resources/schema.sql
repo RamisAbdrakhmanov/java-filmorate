@@ -98,7 +98,6 @@ create TABLE IF NOT EXISTS reviews
     is_positive BOOLEAN,
     user_id     INTEGER REFERENCES users (user_id),
     film_id     INTEGER REFERENCES films (film_id)
-
 );
 
 create TABLE IF NOT EXISTS review_likes
