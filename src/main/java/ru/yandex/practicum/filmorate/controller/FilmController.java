@@ -65,22 +65,27 @@ public class FilmController {
 
 
     @PutMapping("/{id}/like/{userId}")
-    public void addLike(@PathVariable(name = "id") Integer filmId, @PathVariable Integer userId) {
-        filmService.addLike(filmId, userId);
+    public void addLike(@PathVariable(name = "id") Integer filmId,
+                        @PathVariable Integer userId,
+                        @RequestBody Integer rating) {
+        filmService.addLike(filmId, userId, rating);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public void deleteLike(@PathVariable(name = "id") Integer filmId, @PathVariable Integer userId) {
+    public void deleteLike(@PathVariable(name = "id") Integer filmId,
+                           @PathVariable Integer userId) {
         filmService.deleteLike(filmId, userId);
     }
 
     @GetMapping("/common")
-    public List<Film> getCommonFilms(@RequestParam Integer userId, @RequestParam Integer friendId) {
+    public List<Film> getCommonFilms(@RequestParam Integer userId,
+                                     @RequestParam Integer friendId) {
         return filmService.getCommonFilms(userId, friendId);
     }
 
     @GetMapping("/director/{directorId}")
-    public List<Film> getDirectorFilms(@PathVariable(name = "directorId") Integer directorId, @RequestParam String sortBy) {
+    public List<Film> getDirectorFilms(@PathVariable(name = "directorId") Integer directorId,
+                                       @RequestParam String sortBy) {
         return filmService.getDirectorFilms(directorId, sortBy);
     }
 

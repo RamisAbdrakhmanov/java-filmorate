@@ -43,10 +43,10 @@ public class FilmService {
         this.directorDao = directorDao;
     }
 
-    public void addLike(Integer filmId, Integer userId) {
+    public void addLike(Integer filmId, Integer userId, Integer rating) {
         filmDao.getFilmById(filmId);
         userDao.getUserById(userId);
-        likeDao.addLike(filmId, userId);
+        likeDao.addLike(filmId, userId, rating);
         userDao.addEvent(makeEvent("ADD", filmId, userId));
     }
 

@@ -18,12 +18,14 @@ public class LikeDbDao implements LikeDao {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void addLike(Integer filmID, Integer userID) {
+    public void addLike(Integer filmID, Integer userID, Integer rating) {
         try {
+            boolean isLike;
+            isLike = 11 > rating && rating > 5;
             log.info("Запрос на добавление like фильму с id - {} от user c id - {}", filmID, userID);
-            jdbcTemplate.update(""
-                    + "INSERT INTO film_likes (film_id, user_id) "
-                    + "VALUES (?, ?)", filmID, userID);
+            jdbcTemplate.update("" +
+                    "INSERT INTO film_likes (film_id, user_id, rating, is_like ) " +
+                    "VALUES (?, ?, ?, ?)", filmID, userID, rating,isLike);
         } catch (EmptyResultDataAccessException e) {
             log.error("Не возможно найти film с id - {}.(ну или user(-_-))", filmID);
             throw new LikeNotFoundException(format("Не возможно найти film с id - %d.(ну или user(-_-))", filmID));
