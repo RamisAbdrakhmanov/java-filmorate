@@ -170,7 +170,7 @@ public class FilmDbDao implements FilmDao {
             }
         }
 
-        String sql = "SELECT f.*, m.name AS mpa_name, COUNT(fl.film_id) AS num_likes " +
+        String sql = "SELECT f.*, m.name AS mpa_name, AVG(fl.rating) AS avg_rating  " +
                 "FROM films f " +
                 "LEFT JOIN film_directors fd ON f.film_id = fd.film_id " +
                 "LEFT JOIN directors d ON fd.director_id = d.director_id " +
@@ -195,7 +195,7 @@ public class FilmDbDao implements FilmDao {
             throw new IllegalArgumentException("Параметры запроса отсутствуют");
         }
 
-        sql += "WHERE " + whereClause + " GROUP BY f.film_id ORDER BY num_likes DESC";
+        sql += "WHERE " + whereClause + " GROUP BY f.film_id ORDER BY avg_rating DESC";
         Object[] queryParamsArray = queryParams.toArray();
 
         return jdbcTemplate.query(sql, new FilmMapper(), queryParamsArray);
@@ -204,13 +204,13 @@ public class FilmDbDao implements FilmDao {
     @Override
     public List<Film> getBatchFilmsByIds(List<Integer> filmIds) {
         List<String> stringIds = filmIds.stream().map(Object::toString).collect(Collectors.toList());
-        String sql = "SELECT f.*, m.name AS mpa_name, COUNT(fl.film_id) AS num_likes " +
+        String sql = "SELECT f.*, m.name AS mpa_name, AVG(fl.rating) AS avg_rating " +
                 "FROM films f " +
                 "LEFT JOIN mpa_ratings m ON f.mpa_rating_id = m.mpa_rating_id " +
                 "LEFT JOIN film_likes fl ON f.film_id = fl.film_id " +
                 "WHERE f.film_id IN (" + StringUtils.join(stringIds, ',') + ")" +
                 "GROUP BY f.film_id " +
-                "ORDER BY num_likes DESC";
+                "ORDER BY avg_rating DESC";
 
         return jdbcTemplate.query(sql, new FilmMapper());
     }

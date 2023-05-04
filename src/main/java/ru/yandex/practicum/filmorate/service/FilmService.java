@@ -74,14 +74,11 @@ public class FilmService {
 
         if (genreId != null) {
             Genre genre = genreDao.getGenreById(genreId);
-            if (genre == null) {
-                String message = String.format("Фильм с id = %d не найден", genreId);
-                log.warn(message);
-                throw new GenreNotFoundException(message);
-            } else {
+            if (genre != null) {
                 filteredFilms.removeIf(f -> !f.getGenres().contains(genre));
             }
         }
+
         return filteredFilms.stream().peek(this::collectorFilm).limit(count).collect(Collectors.toList());
     }
 

@@ -48,12 +48,12 @@ public class LikeDbDao implements LikeDao {
 
     @Override
     public List<Integer> getLikesSort(Integer count) {
-        log.info("Запрос на вывод самых популярных фильмов в количестве - {}", count);
+        log.info("запрос на вывод самых популярных фильмов в количестве - {}", count);
         List<Integer> filmId = jdbcTemplate.queryForList(format(""
-                + "SELECT film_id "
-                + "FROM film_likes "
-                + "GROUP BY  film_id "
-                + "ORDER BY COUNT(DISTINCT user_id) "
+                + "SELECT fl.film_id "
+                + "FROM film_likes fl "
+                + "GROUP BY fl.film_id "
+                + "ORDER BY AVG(fl.rating) DESC "
                 + "LIMIT %d", count), Integer.class);
         return filmId;
     }
