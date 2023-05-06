@@ -6,8 +6,14 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.notfound.LikeNotFoundException;
+import ru.yandex.practicum.filmorate.exeption.notfound.UserNotFoundException;
+import ru.yandex.practicum.filmorate.storage.mapper.RatingMapper;
+import ru.yandex.practicum.filmorate.util.SlopeOne;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.String.format;
 
@@ -59,17 +65,29 @@ public class LikeDbDao implements LikeDao {
     @Override
     public List<Integer> getRecommendedList(Integer userID) {
         log.info("Запрос на вывод списка рекомендованных фильмов для пользователя с id = {}", userID);
-        return jdbcTemplate.queryForList(format("SELECT fl2.FILM_ID " +
-                "FROM film_likes fl2 " +
-                "WHERE fl2.user_id = " +
-                "(SELECT fl1.user_id " +
-                "FROM film_likes fl1 " +
-                "WHERE fl1.user_id <> %d AND fl1.film_id IN " +
-                "(SELECT fl.film_id " +
-                "FROM film_likes fl " +
-                "WHERE user_id = %d) " +
-                "GROUP BY fl1.user_id " +
-                "ORDER BY COUNT(fl1.film_id) DESC " +
-                "LIMIT 1);", userID, userID), Integer.class);
+        List<Integer[]> films = jdbcTemplate.query("SELECT * FROM film_likes", new RatingMapper());
+        HashMap<Integer, Map<Integer, Double>> userFilms = new HashMap<>();
+        for (Integer[] oneString : films) {
+                if (userFilms.containsKey(oneString[0])) {
+                    userFilms.get(oneString[0]).put(oneString[1], oneString[2].doubleValue());
+                } else {
+                    userFilms.put(oneString[0], Map.of(oneString[1], oneString[2].doubleValue()));
+                }
+        }
+        SlopeOne slopeOne = new SlopeOne();
+        slopeOne.buildDifferencesMatrix(userFilms);
+        Map<Integer, Map<Integer, Integer>> usersPrediction = slopeOne.predict(userFilms);
+        List<Integer> listOfFilms = new ArrayList<>();
+        try {
+            Map<Integer, Integer> predictedFilms = usersPrediction.get(userID);
+            for (Integer film : predictedFilms.keySet()) {
+                if (predictedFilms.get(film) > 5) {
+                    listOfFilms.add(film);
+                }
+            }
+        } catch (NullPointerException e) {
+            throw new UserNotFoundException(String.format("Пользователь с id %s не найден", userID));
+        }
+        return listOfFilms;
     }
 }

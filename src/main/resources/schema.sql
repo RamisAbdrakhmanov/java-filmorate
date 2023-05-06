@@ -70,7 +70,8 @@ create TABLE IF NOT EXISTS friends
 create TABLE IF NOT EXISTS film_likes
 (
     film_id INTEGER REFERENCES films (film_id) ON delete CASCADE,
-    user_id INTEGER REFERENCES users (user_id) ON delete CASCADE
+    user_id INTEGER REFERENCES users (user_id) ON delete CASCADE,
+    rating INTEGER
 );
 create TABLE IF NOT EXISTS reviews
 (
