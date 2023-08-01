@@ -59,7 +59,7 @@ public class FilmControllerTest {
                 " \"mpa\": { " +
                 "\"id\": 5}," +
                 "\"genres\": []}\"";
-        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(filmJson));
+        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(filmJson)).andReturn();
         mockMvc.perform(get("/films/6"))
                 .andDo(print())
                 .andExpect(status().isOk())
