@@ -20,7 +20,7 @@ public class FriendDbDao implements FriendDao {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void addFriend(int userId, int friendId) {
+    public void addFriend(Integer userId, Integer friendId) {
         log.info("запрос на добавления в друзья от user_id={} к friend_id={}", userId, friendId);
         if (userId == friendId) {
             log.info("нельзя добавить самого себя в друзья");
@@ -46,13 +46,13 @@ public class FriendDbDao implements FriendDao {
                         "VALUES(?, ?, ?, ?)", userId, friendId, true, false);
                 break;
             default:
-                throw new FilmNotFoundException("неизвестная команда добавления фильма");
+                throw new FilmNotFoundException("неизвестная команда добавления друзей");
         }
 
     }
 
     @Override
-    public void deleteFriend(int userId, int friendId) {
+    public void deleteFriend(Integer userId, Integer friendId) {
         log.info("запрос на удаление из друзей от user_id={} к friend_id={}", userId, friendId);
         switch (checkFriend(userId, friendId)) {
             case 1:
@@ -78,13 +78,13 @@ public class FriendDbDao implements FriendDao {
                 log.info("user_id={} не был другом с id={}", userId, friendId);
                 throw new FriendNotFoundException(format("user_id=%d не был другом с id=%d", userId, friendId));
             default:
-                throw new FriendNotFoundException("неизвестная команда добавления фильма");
+                throw new FriendNotFoundException("неизвестная команда добавления друзей");
         }
 
     }
 
     @Override
-    public List<Integer> showFriendsById(int userId) {
+    public List<Integer> getFriendsById(Integer userId) {
         log.info("запрос на вывод друзей пользователя ID - {}", userId);
 
         List<Integer> users = jdbcTemplate.queryForList(format(""
@@ -102,7 +102,7 @@ public class FriendDbDao implements FriendDao {
         return users;
     }
 
-    private byte checkFriend(int userId, int friendId) {
+    private byte checkFriend(Integer userId, Integer friendId) {
         log.info("проверка записи друзей");
         try {
 

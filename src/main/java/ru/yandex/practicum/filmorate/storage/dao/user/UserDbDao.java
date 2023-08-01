@@ -6,17 +6,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.notfound.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.validate.FilmNameAlreadyExistException;
 import ru.yandex.practicum.filmorate.exeption.validate.UserEmailAlreadyExistException;
 import ru.yandex.practicum.filmorate.exeption.validate.UserIdNotNullException;
 import ru.yandex.practicum.filmorate.exeption.validate.UserLoginAlreadyExistException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.mapper.EventMapper;
 import ru.yandex.practicum.filmorate.storage.mapper.UserMapper;
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.Objects;
 
 import static java.lang.String.format;
 
@@ -30,8 +36,7 @@ public class UserDbDao implements UserDao {
 
 
     @Override
-    public List<User> showUsers() {
-        log.info("запрос на вывод всех пользователей");
+    public List<User> getUsers() {
         List<User> users = jdbcTemplate.query(""
                 + "SELECT user_id, email, login, name, birthday "
                 + "FROM users", new UserMapper());
@@ -39,8 +44,7 @@ public class UserDbDao implements UserDao {
     }
 
     @Override
-    public User showUserById(int id) {
-        log.info("запрос на вывод пользователя по id - {}", id);
+    public User getUserById(Integer id) {
         try {
             User user = jdbcTemplate.queryForObject(format(""
                     + "SELECT user_id, email, login, name, birthday "
@@ -49,14 +53,14 @@ public class UserDbDao implements UserDao {
 
             return user;
         } catch (EmptyResultDataAccessException e) {
-            log.warn("Не возможно найти user с id - {}.", id);
-            throw new UserNotFoundException(String.format("Не возможно найти user с id - %s.", id));
+            String message = String.format("Не возможно найти пользователя с id = %d", id);
+            log.warn(message);
+            throw new UserNotFoundException(message);
         }
     }
 
     @Override
     public User addUser(User user) {
-        log.info("запрос на добавление пользователя - {}", user);
         checkAdd(user);
 
         jdbcTemplate.update(""
@@ -75,8 +79,7 @@ public class UserDbDao implements UserDao {
     }
 
     @Override
-    public User changeUser(User user) {
-        log.info("запрос на изменение пользователя - {}", user);
+    public User updateUser(User user) {
         checkChange(user);
         jdbcTemplate.update(""
                         + "UPDATE users "
@@ -87,24 +90,45 @@ public class UserDbDao implements UserDao {
                 user.getName(),
                 Date.valueOf(user.getBirthday()),
                 user.getId());
-        User result = showUserById(user.getId());
+        User result = getUserById(user.getId());
         return result;
     }
 
 
     @Override
-    public void deleteUserById(int id) {
-        log.info("запрос на вывод удаление по id - {}", id);
-
+    public void deleteUserById(Integer id) {
         jdbcTemplate.update("DELETE " +
                 "FROM users " +
                 "WHERE user_id = ?", id);
     }
 
+    @Override
+    public Event addEvent(Event event) {
+        String sql = "INSERT INTO events (timestamp, user_id, event_type, operation, entity_id) " +
+                "VALUES (?, ?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement(sql, new String[]{"event_id"});
+            ps.setLong(1, event.getTimestamp());
+            ps.setInt(2, event.getUserId());
+            ps.setString(3, event.getEventType());
+            ps.setString(4, event.getOperation());
+            ps.setInt(5, event.getEntityId());
+            return ps;
+        }, keyHolder);
+        event.setEventId(Objects.requireNonNull(keyHolder.getKey()).intValue());
+        return event;
+    }
+
+    @Override
+    public List<Event> getFeed(Integer userId) {
+        return jdbcTemplate.query("SELECT * FROM events WHERE user_id = ?", new EventMapper(), userId);
+    }
+
     private void checkAdd(User user) {
         log.info("проверка на добавление user - {}", user);
 
-        if (user.getId() != 0) {
+        if (user.getId() != null) {
             log.error("user_id не должно иметь значение");
             throw new UserIdNotNullException("user_id не должно иметь значение");
         }
@@ -138,6 +162,7 @@ public class UserDbDao implements UserDao {
             log.error("Невозможно добавить user. User c email - {} уже имеет ID - {}",
                     emailUser.getEmail(),
                     emailUser.getId());
+
             throw new UserEmailAlreadyExistException(
                     String.format("Невозможно добавить user. User c email - %s уже имеет ID - %s",
                             emailUser.getEmail(),
@@ -155,14 +180,14 @@ public class UserDbDao implements UserDao {
 
     private void checkChange(User user) {
         log.info("проверка на изменение user - {}", user);
-        showUserById(user.getId());
+        getUserById(user.getId());
         try {
             User loginUser = jdbcTemplate.queryForObject(format(""
                     + "SELECT user_id, email, login, name, birthday "
                     + "FROM users "
                     + "WHERE login= '%s'", user.getLogin()), new UserMapper());
 
-            if (loginUser.getId() != user.getId()) {
+            if (!Objects.equals(loginUser.getId(), user.getId())) {
                 log.error("Невозможно изменить login. User c login - {} уже имеет ID - {}",
                         loginUser.getLogin(),
                         loginUser.getId());
@@ -183,7 +208,7 @@ public class UserDbDao implements UserDao {
                     + "FROM users "
                     + "WHERE name= '%s'", user.getEmail()), new UserMapper());
 
-            if (emailUser.getId() != user.getId()) {
+            if (!Objects.equals(emailUser.getId(), user.getId())) {
                 log.error("Невозможно изменить email. User c email - {} уже имеет ID - {}",
                         emailUser.getEmail(),
                         emailUser.getId());
@@ -204,4 +229,5 @@ public class UserDbDao implements UserDao {
 
 
     }
+
 }

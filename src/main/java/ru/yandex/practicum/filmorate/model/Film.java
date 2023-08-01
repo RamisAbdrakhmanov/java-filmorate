@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -16,8 +17,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class Film {
-    private int id;
-    @NotNull(message = "Film name cannot be not null")
+    private Integer id;
+
     @NotEmpty(message = "Film name cannot be not empty")
     @NotBlank(message = "Film name cannot be not blank")
     private String name;
@@ -30,12 +31,13 @@ public class Film {
     @NotNull(message = "Film need to be rated")
     private Mpa mpa;
     private Set<Genre> genres = new HashSet<>();
+    private Set<Director> directors = new HashSet<>();
 
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Film film = (Film) o;
-        return id == film.id;
+        return Objects.equals(id, film.id);
     }
 
     @Override

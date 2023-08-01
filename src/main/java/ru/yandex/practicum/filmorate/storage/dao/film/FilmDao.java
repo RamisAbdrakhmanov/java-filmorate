@@ -8,13 +8,21 @@ import java.util.List;
 @Component
 public interface FilmDao {
 
-    Film showFilmById(int id);
+    Film getFilmById(Integer id);
 
-    List<Film> showFilms();
+    List<Film> getFilms();
 
     Film addFilm(Film film);
 
-    Film changeFilm(Film film);
+    Film updateFilm(Film film);
 
-    void deleteFilmById(int id);
+    List<Integer> getUsersLikedFilms(Integer id);
+
+    void deleteFilmById(Integer id);
+
+    List<Film> getCommonFilms(Integer userId, Integer friendId);
+
+    List<Film> searchFilms(String query, String by);
+
+    List<Film> getBatchFilmsByIds(List<Integer> filmIds);
 }

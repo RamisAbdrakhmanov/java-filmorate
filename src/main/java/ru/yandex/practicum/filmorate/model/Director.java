@@ -5,40 +5,30 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
-import java.time.LocalDate;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
-
+public class Director {
     private Integer id;
-    @Email(message = "It's not email.")
-    private String email;
-    @NotBlank(message = "User login cannot be empty and contains spaces.")
-    private String login;
+
+    @NotBlank(message = "Director name cannot be not blank")
     private String name;
-    @Past(message = "Date of birth cannot be in the future.")
-    private LocalDate birthday;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
-        User user = (User) o;
-
-        return id == user.id;
+        Director director = (Director) o;
+        return Objects.equals(id, director.id);
     }
 
     @Override
     public int hashCode() {
         return id;
     }
-
 }
 

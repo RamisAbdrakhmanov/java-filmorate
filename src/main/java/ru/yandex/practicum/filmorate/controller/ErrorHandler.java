@@ -53,6 +53,12 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handlerReviewValidateException(final ReviewValidateException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
